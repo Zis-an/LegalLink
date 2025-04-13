@@ -353,6 +353,12 @@ return [
             'icon' => 'fas fa-fw fa-key mr-2',
             'can' => ['permissions.list','permissions.create','permissions.show','permissions.update','permissions.delete'],
         ],
+        [
+            'text' => 'Users',
+            'url' => 'users',
+            'icon' => 'fas fa-fw fa-users-cog mr-2',
+            'can' => ['users.list','users.create','users.update','users.delete'],
+        ],
 
 //        [
 //            'type' => 'sidebar-menu-search',

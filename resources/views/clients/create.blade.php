@@ -22,7 +22,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('clients.store') }}" method="POST">
+                    <form action="{{ route('clients.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         @if ($errors->any())
@@ -36,8 +36,29 @@
                         @endif
 
                         <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" name="name" class="form-control" id="name" placeholder="Enter client name" required>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>User</label>
+                                    <select name="user_id" class="form-control">
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Date of Birth</label>
+                                    <input type="date" name="dob" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Photo</label>
+                                    <input type="file" name="photo" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label>Address</label>
+                                <textarea class="form-control" name="address"></textarea>
+                            </div>
                         </div>
 
                         @can('clients.create')

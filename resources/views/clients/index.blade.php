@@ -5,7 +5,7 @@
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>Cases</h1>
+            <h1>Clients</h1>
             @can('clients.create')
                 <a href="{{ route('clients.create') }}" class="btn btn-primary mt-2">Add new</a>
             @endcan
@@ -19,23 +19,35 @@
     </div>
 @stop
 
+@if ($message = Session::get('success'))
+    <div class="alert alert-success">{{ $message }}</div>
+@endif
+
 @section('content')
     <div class="row">
         <div class="col-12">
             @can('clients.list')
                 <div class="card">
                     <div class="card-body table-responsive">
-                        <table id="permissionsList" class="table  dataTable table-bordered table-striped">
+                        <table id="clientsList" class="table  dataTable table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Client</th>
-                                <th width="80px">Action</th>
+                                <th>SL</th>
+                                <th>User Name</th>
+                                <th>Address</th>
+                                <th>DOB</th>
+                                <th>Photo</th>
+                                <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($clients as $client)
                                 <tr>
-                                    <td class="text-capitalize">{{ $client->name }}</td>
+                                    <td>{{ ++$i }}</td>
+                                    <td><img src="{{ asset('storage/' . $client->photo) }}" width="50"></td>
+                                    <td class="text-capitalize">{{ $client->user->name }}</td>
+                                    <td>{{ $client->address }}</td>
+                                    <td>{{ $client->dob }}</td>
                                     <td>
                                         <form action="{{ route('clients.destroy', $client->id) }}" method="POST">
                                             @method('DELETE')
@@ -104,7 +116,7 @@
         }
 
         $(document).ready(function () {
-            $('#permissionsList').DataTable({
+            $('#clientsList').DataTable({
                 responsive: true,
                 lengthChange: false,
                 autoWidth: false,

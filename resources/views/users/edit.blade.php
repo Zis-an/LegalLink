@@ -1,74 +1,136 @@
-@extends('layouts.app')
+@extends('adminlte::page')
+
+@section('title', 'Edit User')
+
+@section('content_header')
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Edit User</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Users</a></li>
+                <li class="breadcrumb-item active">Edit User</li>
+            </ol>
+        </div>
+    </div>
+@stop
 
 @section('content')
     <div class="row">
-        <div class="col-lg-12 margin-tb">
-            <div class="pull-left">
-                <h2>Edit User</h2>
-            </div>
-            <div class="pull-right">
-                <a class="btn btn-primary btn-sm mb-2" href="{{ route('users.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ route('users.update', $user->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input name="name" type="text" required class="form-control" id="name" value="{{ $user->name }}" placeholder="Enter user name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input name="email" type="email" required class="form-control" id="email" value="{{ $user->email }}" placeholder="Enter email">
+                        </div>
+
+                        <div class="form-group position-relative">
+                            <label for="password">Password (Leave blank to keep current)</label>
+                            <div class="input-group">
+                                <input name="password" type="password" class="form-control" id="password" placeholder="Enter new password">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                        <i class="fas fa-eye" id="eyeIcon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group position-relative">
+                            <label for="confirm-password">Confirm Password</label>
+                            <div class="input-group">
+                                <input name="confirm-password" type="password" class="form-control" id="confirm-password" placeholder="Confirm new password">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                                        <i class="fas fa-eye" id="eyeConfirmIcon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="roles">Assign Role</label>
+                            <select name="roles[]" class="form-control select2" multiple required>
+                                @foreach($roles as $role)
+                                    <option value="{{ $role }}" @if(in_array($role, $userRole)) selected @endif>{{ $role }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <button class="btn btn-success" type="submit">Update</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+@stop
 
-    @if (count($errors) > 0)
-        <div class="alert alert-danger">
-            <strong>Whoops!</strong> There were some problems with your input.<br><br>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+@section('footer')
+@stop
 
-    <form method="POST" action="{{ route('users.update', $user->id) }}">
-        @csrf
-        @method('PUT')
+@section('css')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+@stop
 
-        <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12">
-                <div class="form-group">
-                    <strong>Name:</strong>
-                    <input type="text" name="name" placeholder="Name" class="form-control" value="{{ $user->name }}">
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
-                <div class="form-group">
-                    <strong>Email:</strong>
-                    <input type="email" name="email" placeholder="Email" class="form-control" value="{{ $user->email }}">
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
-                <div class="form-group">
-                    <strong>Password:</strong>
-                    <input type="password" name="password" placeholder="Password" class="form-control">
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
-                <div class="form-group">
-                    <strong>Confirm Password:</strong>
-                    <input type="password" name="confirm-password" placeholder="Confirm Password" class="form-control">
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
-                <div class="form-group">
-                    <strong>Role:</strong>
-                    <select name="roles[]" class="form-control" multiple="multiple">
-                        @foreach ($roles as $value => $label)
-                            <option value="{{ $value }}" {{ isset($userRole[$value]) ? 'selected' : ''}}>
-                                {{ $label }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-12 col-md-12 text-center">
-                <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
-            </div>
-        </div>
-    </form>
+@section('js')
+    <!-- Select2 JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize select2 on the roles select
+            $('.select2').select2({
+                placeholder: "Select a role",
+                allowClear: true
+            });
 
-    <p class="text-center text-primary"><small>Tutorial by ItSolutionStuff.com</small></p>
-@endsection
+            // Password show/hide functionality
+            $('#togglePassword').on('click', function() {
+                const passwordField = $('#password');
+                const icon = $('#eyeIcon');
+                if (passwordField.attr('type') === 'password') {
+                    passwordField.attr('type', 'text');
+                    icon.removeClass('fas fa-eye').addClass('fas fa-eye-slash');
+                } else {
+                    passwordField.attr('type', 'password');
+                    icon.removeClass('fas fa-eye-slash').addClass('fas fa-eye');
+                }
+            });
+
+            // Confirm password show/hide functionality
+            $('#toggleConfirmPassword').on('click', function() {
+                const confirmPasswordField = $('#confirm-password');
+                const icon = $('#eyeConfirmIcon');
+                if (confirmPasswordField.attr('type') === 'password') {
+                    confirmPasswordField.attr('type', 'text');
+                    icon.removeClass('fas fa-eye').addClass('fas fa-eye-slash');
+                } else {
+                    confirmPasswordField.attr('type', 'password');
+                    icon.removeClass('fas fa-eye-slash').addClass('fas fa-eye');
+                }
+            });
+        });
+    </script>
+@stop

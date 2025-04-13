@@ -10,6 +10,16 @@ class Client extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'user_id',
+        'address',
+        'dob',
+        'photo',
     ];
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

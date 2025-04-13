@@ -32,14 +32,16 @@ Route::middleware(['auth'])->group(function () {
     // Resource routes for roles, users, and products
     Route::resource('roles', RoleController::class);
     Route::resource('permissions',PermissionController::class);
-
-
-    Route::resource('users', UserController::class);
     Route::resource('cases', CaseController::class);
     Route::resource('bids', BidController::class);
     Route::resource('clients', ClientController::class);
     Route::resource('consultations', ConsultationController::class);
     Route::resource('lawyers', LawyerController::class);
+});
+
+// 👇 Restrict user management to only admin
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('users', UserController::class);
 });
 
 require __DIR__.'/auth.php';

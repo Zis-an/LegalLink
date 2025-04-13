@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('lawsuits', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->unsignedBigInteger('client_id');
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
+            $table->string('title');
+            $table->text('description');
+            $table->string('voice_note');
+            $table->enum('status', ['open', 'in_progress', 'closed'])->default('open');
             $table->timestamps();
         });
     }

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ClientController extends Controller
 {
@@ -19,57 +21,89 @@ class ClientController extends Controller
 
     public function index(Request $request): View
     {
-        $clients = Client::orderBy('id','DESC')->paginate(5);
-        return view('clients.index', compact('clients'))->with('i', ($request->input('page', 1) - 1) * 5);
+        $clients = Client::with('user')->orderByDesc('id')->paginate(5);
+        return view('clients.index', compact('clients'))
+            ->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
     public function create(): View
     {
-        return view('clients.create');
+        $users = User::role('client')->get();
+        return view('clients.create', compact('users'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-
+            'user_id' => 'required|exists:users,id',
+            'address' => 'required',
+            'dob' => 'required|date',
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $client = Client::create([
-            'name' => $request->name,
+        $path = $request->file('photo')->store('clients', 'public');
+
+        Client::create([
+            'user_id' => $request->user_id,
+            'address' => $request->address,
+            'dob' => $request->dob,
+            'photo' => $path,
         ]);
 
-        return redirect()->route('clients.index')->with('success', 'client created successfully');
+        return redirect()->route('clients.index')->with('success', 'Client created successfully');
     }
 
     public function show($id): View
     {
-        $client = Client::findOrFail($id);
-
+        $client = Client::with('user')->findOrFail($id);
         return view('clients.show', compact('client'));
     }
 
     public function edit($id): View
     {
         $client = Client::findOrFail($id);
-        return view('clients.edit', compact('client'));
+        $users = User::all();
+        return view('clients.edit', compact('client', 'users'));
     }
 
     public function update(Request $request, $id): RedirectResponse
     {
+        $client = Client::findOrFail($id);
+
         $request->validate([
-            'name' => 'required',
+            'user_id' => 'required|exists:users,id',
+            'address' => 'required',
+            'dob' => 'required|date',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $client = Client::findOrFail($id);
-        $client->name = $request->name;
-        $client->save();
+        $data = $request->only('user_id', 'address', 'dob');
 
-        return redirect()->route('clients.index')->with('success', 'client updated successfully');
+        if ($request->hasFile('photo')) {
+            // Delete old photo
+            if ($client->photo && Storage::disk('public')->exists($client->photo)) {
+                Storage::disk('public')->delete($client->photo);
+            }
+
+            $data['photo'] = $request->file('photo')->store('clients', 'public');
+        }
+
+        $client->update($data);
+
+        return redirect()->route('clients.index')->with('success', 'Client updated successfully');
     }
 
     public function destroy($id): RedirectResponse
     {
-        Client::findOrFail($id)->delete();
-        return redirect()->route('clients.index')->with('success', 'client deleted successfully');
+        $client = Client::findOrFail($id);
+
+        // Delete photo
+        if ($client->photo && Storage::disk('public')->exists($client->photo)) {
+            Storage::disk('public')->delete($client->photo);
+        }
+
+        $client->delete();
+
+        return redirect()->route('clients.index')->with('success', 'Client deleted successfully');
     }
 }

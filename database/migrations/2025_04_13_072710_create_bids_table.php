@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('bids', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->unsignedBigInteger('case_id');
+            $table->unsignedBigInteger('lawyer_id');
+            $table->foreign('case_id')->references('id')->on('lawsuits')->onDelete('restrict');
+            $table->foreign('lawyer_id')->references('id')->on('lawyers')->onDelete('restrict');
+            $table->decimal('fee');
+            $table->date('time_estimated');
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

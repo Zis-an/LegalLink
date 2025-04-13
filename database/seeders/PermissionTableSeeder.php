@@ -56,6 +56,12 @@ class PermissionTableSeeder extends Seeder
             'lawyers.update',
             'lawyers.delete',
 
+            'users.list',
+            'users.create',
+            'users.show',
+            'users.update',
+            'users.delete',
+
         ];
 
         foreach ($permissions as $permission) {
