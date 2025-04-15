@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
+use App\Models\Lawyer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -60,6 +62,31 @@ class UserController extends Controller
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
 
+        if (in_array('Client', $request->input('roles'))) {
+            $clientPhotoPath = $request->file('client_photo')?->store('clients', 'public');
+
+            Client::create([
+                'user_id' => $user->id,
+                'dob' => $request->client_dob,
+                'address' => $request->client_address,
+                'photo' => $clientPhotoPath,
+            ]);
+        }
+
+        if (in_array('Lawyer', $request->input('roles'))) {
+            $lawyerPhotoPath = $request->file('lawyer_photo')?->store('lawyers', 'public');
+
+            Lawyer::create([
+                'id' => $user->id, // Note: lawyer id = user_id
+                'bar_id' => $request->lawyer_bar_id,
+                'user_id' => $user->id,
+                'practice_area' => $request->lawyer_practice_area,
+                'chamber_name' => $request->lawyer_chamber_name,
+                'chamber_address' => $request->lawyer_chamber_address,
+                'photo' => $lawyerPhotoPath,
+            ]);
+        }
+
         return redirect()->route('users.index')
             ->with('success','User created successfully');
     }
@@ -85,11 +112,13 @@ class UserController extends Controller
      */
     public function edit($id): View
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
         $roles = Role::pluck('name','name')->all();
         $userRole = $user->roles->pluck('name','name')->all();
+        $client = $user->client;
+        $lawyer = $user->lawyer;
 
-        return view('users.edit',compact('user','roles','userRole'));
+        return view('users.edit',compact('user','roles','userRole', 'client', 'lawyer'));
     }
 
     /**

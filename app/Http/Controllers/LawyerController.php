@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lawyer;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -19,23 +21,37 @@ class LawyerController extends Controller
 
     public function index(Request $request): View
     {
-        $lawyers = Lawyer::orderBy('id','DESC')->paginate(5);
-        return view('lawyers.index', compact('lawyers'))->with('i', ($request->input('page', 1) - 1) * 5);
+        $lawyers = Lawyer::with('user')->orderByDesc('id')->paginate(5);
+        return view('lawyers.index', compact('lawyers'))
+            ->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
     public function create(): View
     {
-        return view('lawyers.create');
+        $users = User::role('lawyer')->get();
+        return view('lawyers.create', compact('users'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-
+            'bar_id' => 'required',
+            'user_id' => 'required|exists:users,id',
+            'practice_area' => 'required',
+            'chamber_name' => 'required',
+            'chamber_address' => 'required',
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $lawyer = Lawyer::create([
-            'name' => $request->name,
+        $path = $request->file('photo')->store('lawyers', 'public');
+
+        Lawyer::create([
+            'bar_id' => $request->bar_id,
+            'user_id' => $request->user_id,
+            'practice_area' => $request->practice_area,
+            'chamber_name' => $request->chamber_name,
+            'chamber_address' => $request->chamber_address,
+            'photo' => $path,
         ]);
 
         return redirect()->route('lawyers.index')->with('success', 'Lawyer created successfully');
@@ -43,33 +59,56 @@ class LawyerController extends Controller
 
     public function show($id): View
     {
-        $lawyer = Lawyer::findOrFail($id);
-
+        $lawyer = Lawyer::with('user')->findOrFail($id);
         return view('lawyers.show', compact('lawyer'));
     }
 
     public function edit($id): View
     {
         $lawyer = Lawyer::findOrFail($id);
-        return view('lawyers.edit', compact('lawyer'));
+        $users = User::role('lawyer')->get();
+        return view('lawyers.edit', compact('lawyer', 'users'));
     }
 
     public function update(Request $request, $id): RedirectResponse
     {
+        $lawyer = Lawyer::findOrFail($id);
+
         $request->validate([
-            'name' => 'required',
+            'bar_id' => 'required',
+            'user_id' => 'required|exists:users,id',
+            'practice_area' => 'required',
+            'chamber_name' => 'required',
+            'chamber_address' => 'required',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $lawyer = Lawyer::findOrFail($id);
-        $lawyer->name = $request->name;
-        $lawyer->save();
+        $data = $request->only('bar_id', 'user_id', 'practice_area', 'chamber_name', 'chamber_address');
+
+        if ($request->hasFile('photo')) {
+            if ($lawyer->photo && Storage::disk('public')->exists($lawyer->photo)) {
+                Storage::disk('public')->delete($lawyer->photo);
+            }
+            $data['photo'] = $request->file('photo')->store('lawyers', 'public');
+        }
+
+        $lawyer->update($data);
 
         return redirect()->route('lawyers.index')->with('success', 'Lawyer updated successfully');
     }
 
     public function destroy($id): RedirectResponse
     {
-        Lawyer::findOrFail($id)->delete();
+        $lawyer = Lawyer::findOrFail($id);
+        $user = User::findOrFail($lawyer->user_id);
+
+        if ($lawyer->photo && Storage::disk('public')->exists($lawyer->photo)) {
+            Storage::disk('public')->delete($lawyer->photo);
+        }
+
+        $lawyer->delete();
+        $user->delete(); // Optional: if you're deleting the associated user
+
         return redirect()->route('lawyers.index')->with('success', 'Lawyer deleted successfully');
     }
 }

@@ -7,7 +7,7 @@
         <div class="col-sm-6">
             <h1>Lawyers</h1>
             @can('lawyers.create')
-                <a href="{{ route('lawyers.create') }}" class="btn btn-primary mt-2">Add new</a>
+                <a href="{{ route('users.create') }}" class="btn btn-primary mt-2">Add new</a>
             @endcan
         </div>
         <div class="col-sm-6">
@@ -22,32 +22,47 @@
 @section('content')
     <div class="row">
         <div class="col-12">
+            @if ($message = Session::get('success'))
+                <div class="alert alert-success">{{ $message }}</div>
+            @endif
+
             @can('lawyers.list')
                 <div class="card">
                     <div class="card-body table-responsive">
-                        <table id="lawyersList" class="table  dataTable table-bordered table-striped">
+                        <table id="lawyersList" class="table dataTable table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Name</th>
-                                <th width="80px">Action</th>
+                                <th>SL</th>
+                                <th>Photo</th>
+                                <th>User Name</th>
+                                <th>Bar ID</th>
+                                <th>Practice Area</th>
+                                <th>Chamber Name</th>
+                                <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($lawyers as $lawyer)
                                 <tr>
-                                    <td class="text-capitalize">{{ $lawyer->name }}</td>
+                                    <td>{{ ++$i }}</td>
+                                    <td><img src="{{ asset('storage/' . $lawyer->photo) }}" width="50"></td>
+                                    <td class="text-capitalize">{{ $lawyer->user->name }}</td>
+                                    <td>{{ $lawyer->bar_id }}</td>
+                                    <td>{{ $lawyer->practice_area }}</td>
+                                    <td>{{ $lawyer->chamber_name }}</td>
                                     <td>
                                         <form action="{{ route('lawyers.destroy', $lawyer->id) }}" method="POST">
-                                            @method('DELETE')
                                             @csrf
+                                            @method('DELETE')
+
                                             @can('lawyers.show')
-                                                <a href="{{ route('lawyers.show',['lawyer'=>$lawyer->id]) }}"
+                                                <a href="{{ route('lawyers.show', $lawyer->id) }}"
                                                    class="btn btn-info px-1 py-0 btn-sm">
                                                     <i class="fa fa-eye"></i>
                                                 </a>
                                             @endcan
-                                            @can('lawyers.update')
-                                                <a href="{{route('lawyers.edit',['lawyer'=>$lawyer->id])}}"
+                                            @can('cases.update')
+                                                <a href="{{ route('users.edit', $lawyer->user_id) }}"
                                                    class="btn btn-warning px-1 py-0 btn-sm">
                                                     <i class="fa fa-pen"></i>
                                                 </a>
@@ -71,12 +86,6 @@
     </div>
 @stop
 
-@section('footer')
-@stop
-
-@section('css')
-@stop
-
 @section('plugins.datatablesPlugins', true)
 @section('plugins.Datatables', true)
 @section('plugins.Sweetalert2', true)
@@ -85,8 +94,7 @@
     <script>
         function isDelete(button) {
             event.preventDefault();
-            var row = $(button).closest("tr");
-            var form = $(button).closest("form");
+            const form = $(button).closest("form");
             Swal.fire({
                 title: @json(__('Delete Lawyer')),
                 text: @json(__('Are you sure you want to delete this?')),
@@ -95,9 +103,7 @@
                 confirmButtonText: @json(__('Delete')),
                 cancelButtonText: @json(__('Cancel')),
             }).then((result) => {
-                console.log(result)
                 if (result.value) {
-                    // Trigger the form submission
                     form.submit();
                 }
             });
@@ -110,15 +116,7 @@
                 autoWidth: false,
                 ordering: true,
                 info: true,
-                pageLength: 10,
-                language: {
-                    paginate: {
-                        first: "First",
-                        previous: "Previous",
-                        next: "Next",
-                        last: "Last"
-                    }
-                }
+                pageLength: 10
             });
         });
     </script>

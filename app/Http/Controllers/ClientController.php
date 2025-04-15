@@ -96,6 +96,7 @@ class ClientController extends Controller
     public function destroy($id): RedirectResponse
     {
         $client = Client::findOrFail($id);
+        $user = User::findOrFail($client->user_id);
 
         // Delete photo
         if ($client->photo && Storage::disk('public')->exists($client->photo)) {
@@ -103,6 +104,7 @@ class ClientController extends Controller
         }
 
         $client->delete();
+        $user->delete();
 
         return redirect()->route('clients.index')->with('success', 'Client deleted successfully');
     }

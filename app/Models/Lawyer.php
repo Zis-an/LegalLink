@@ -10,6 +10,18 @@ class Lawyer extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'id',
+        'bar_id',
+        'user_id',
+        'practice_area',
+        'chamber_name',
+        'chamber_address',
+        'photo',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

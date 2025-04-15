@@ -5,7 +5,7 @@
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>View Client - {{ $client->name }}</h1>
+            <h1>View Client - {{ $client->user->name }}</h1>
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -23,8 +23,8 @@
             <div class="card">
                 <div class="card-body">
                     @if (count($errors) > 0)
-                        <div class = "alert alert-danger">
-                            <ul>
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
@@ -32,9 +32,31 @@
                         </div>
                     @endif
 
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" class="form-control" value="{{ $client->name }}" disabled>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Name</label>
+                            <input type="text" class="form-control" value="{{ $client->user->name }}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Email</label>
+                            <input type="text" class="form-control" value="{{ $client->user->email }}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Date of Birth</label>
+                            <input type="text" class="form-control" value="{{ $client->dob }}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Address</label>
+                            <input type="text" class="form-control" value="{{ $client->address }}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Photo</label><br>
+                            @if ($client->photo)
+                                <img src="{{ asset('storage/' . $client->photo) }}" class="img-thumbnail" width="120">
+                            @else
+                                <p class="text-muted">No photo</p>
+                            @endif
+                        </div>
                     </div>
 
                     <form action="{{ route('clients.destroy', $client->id) }}" method="POST" class="mt-4">
@@ -46,13 +68,14 @@
                         @endcan
 
                         @can('clients.update')
-                            <a href="{{ route('clients.edit', $client->id) }}" class="btn btn-warning btn-sm">
+                            <a href="{{ route('users.edit', $client->user_id) }}" class="btn btn-warning btn-sm">
                                 <i class="fa fa-pen"></i> Edit
                             </a>
                         @endcan
 
                         @can('clients.delete')
-                            <button type="button" onclick="confirmDelete(this)" class="btn btn-danger btn-sm">
+                            <button type="button" onclick="isDelete(this)"
+                                    class="btn btn-danger btn-sm">
                                 <i class="fa fa-trash"></i> Delete
                             </button>
                         @endcan
@@ -63,24 +86,17 @@
     </div>
 @stop
 
-@section('footer')
-@stop
-
-@section('css')
-@stop
-
-
 @section('plugins.Sweetalert2', true)
 
 @section('js')
     <script>
-        function confirmDelete(button) {
+        function isDelete(button) {
             event.preventDefault();
             var row = $(button).closest("tr");
             var form = $(button).closest("form");
             Swal.fire({
                 title: @json(__('Delete Client')),
-                text: @json(__('Are you sure you want to delete this client?')),
+                text: @json(__('Are you sure you want to delete this?')),
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: @json(__('Delete')),

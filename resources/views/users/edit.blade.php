@@ -3,9 +3,14 @@
 @section('title', 'Edit User')
 
 @section('content_header')
+
+    @php
+        $roleTitle = implode(', ', $userRole); // Shows assigned roles, comma-separated
+    @endphp
+
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>Edit User</h1>
+            <h1>Edit {{ $roleTitle }}</h1>
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -79,6 +84,52 @@
                             </select>
                         </div>
 
+                        {{-- Client Fields --}}
+                        <div id="client-fields" style="display: none;">
+                            <h5 class="mt-4 mb-3">Client Information</h5>
+                            <div class="row">
+                                <div class="form-group col-md-4">
+                                    <label>Date of Birth</label>
+                                    <input type="date" name="client_dob" class="form-control" value="{{ $client?->dob }}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Photo</label>
+                                    <input type="file" name="client_photo" class="form-control">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Address</label>
+                                    <textarea name="client_address" class="form-control" rows="1">{{ $client?->address }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Lawyer Fields --}}
+                        <div id="lawyer-fields" style="display: none;">
+                            <h5 class="mt-4 mb-3">Lawyer Information</h5>
+                            <div class="row">
+                                <div class="form-group col-md-4">
+                                    <label>Bar Council ID</label>
+                                    <input type="text" name="lawyer_bar_id" class="form-control" value="{{ $lawyer?->bar_id }}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Practice Area</label>
+                                    <input type="text" name="lawyer_practice_area" class="form-control" value="{{ $lawyer?->practice_area }}">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Photo</label>
+                                    <input type="file" name="lawyer_photo" class="form-control">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Chamber Name</label>
+                                    <input type="text" name="lawyer_chamber_name" class="form-control" value="{{ $lawyer?->chamber_name }}">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Chamber Address</label>
+                                    <textarea name="lawyer_chamber_address" class="form-control" rows="1">{{ $lawyer?->chamber_address }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
                         <button class="btn btn-success" type="submit">Update</button>
                     </form>
                 </div>
@@ -131,6 +182,21 @@
                     icon.removeClass('fas fa-eye-slash').addClass('fas fa-eye');
                 }
             });
+
+            function toggleExtraFields() {
+                const selectedRoles = $('.select2').val();
+                $('#client-fields, #lawyer-fields').hide();
+
+                if (selectedRoles.includes('Client')) {
+                    $('#client-fields').show();
+                }
+                if (selectedRoles.includes('Lawyer')) {
+                    $('#lawyer-fields').show();
+                }
+            }
+
+            $('.select2').on('change', toggleExtraFields);
+            toggleExtraFields(); // Call on page load
         });
     </script>
 @stop

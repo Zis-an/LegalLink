@@ -7,7 +7,7 @@
         <div class="col-sm-6">
             <h1>Clients</h1>
             @can('clients.create')
-                <a href="{{ route('clients.create') }}" class="btn btn-primary mt-2">Add new</a>
+                <a href="{{ route('users.create') }}" class="btn btn-primary mt-2">Add new</a>
             @endcan
         </div>
         <div class="col-sm-6">
@@ -19,13 +19,14 @@
     </div>
 @stop
 
-@if ($message = Session::get('success'))
-    <div class="alert alert-success">{{ $message }}</div>
-@endif
-
 @section('content')
     <div class="row">
         <div class="col-12">
+
+            @if ($message = Session::get('success'))
+                <div class="alert alert-success">{{ $message }}</div>
+            @endif
+
             @can('clients.list')
                 <div class="card">
                     <div class="card-body table-responsive">
@@ -33,10 +34,10 @@
                             <thead>
                             <tr>
                                 <th>SL</th>
+                                <th>Photo</th>
                                 <th>User Name</th>
                                 <th>Address</th>
                                 <th>DOB</th>
-                                <th>Photo</th>
                                 <th>Actions</th>
                             </tr>
                             </thead>
@@ -47,7 +48,7 @@
                                     <td><img src="{{ asset('storage/' . $client->photo) }}" width="50"></td>
                                     <td class="text-capitalize">{{ $client->user->name }}</td>
                                     <td>{{ $client->address }}</td>
-                                    <td>{{ $client->dob }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($client->dob)->format('j F, Y') }}</td>
                                     <td>
                                         <form action="{{ route('clients.destroy', $client->id) }}" method="POST">
                                             @method('DELETE')
@@ -59,7 +60,7 @@
                                                 </a>
                                             @endcan
                                             @can('cases.update')
-                                                <a href="{{route('clients.edit',['client'=>$client->id])}}"
+                                                <a href="{{ route('users.edit',['user'=>$client->user_id]) }}"
                                                    class="btn btn-warning px-1 py-0 btn-sm">
                                                     <i class="fa fa-pen"></i>
                                                 </a>

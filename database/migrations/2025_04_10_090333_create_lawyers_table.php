@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('lawyers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('bar_id')->comment('Bar Council ID');
             $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
-            $table->unsignedInteger('bar_id')->comment('Bar Council ID');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('practice_area');
             $table->string('chamber_name');
             $table->text('chamber_address');

@@ -47,11 +47,14 @@ class User extends Authenticatable
         ];
     }
 
-//    public function adminlte_profile_url()
-//    {
-//        if (auth()->check()) {
-//            return route('profile.edit');
-//        }
-//        return '#';
-//    }
+    public function client()
+    {
+        return $this->hasOne(Client::class);
+    }
+
+    public function lawyer()
+    {
+        return $this->hasOne(Lawyer::class);
+    }
+
 }
