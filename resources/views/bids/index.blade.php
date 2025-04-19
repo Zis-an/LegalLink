@@ -28,14 +28,22 @@
                         <table id="bidsList" class="table  dataTable table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Bid</th>
-                                <th width="80px">Action</th>
+                                <th>Case</th>
+                                <th>Lawyer</th>
+                                <th>Fees</th>
+                                <th>Estimated Time</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($bids as $bid)
                                 <tr>
-                                    <td class="text-capitalize">{{ $bid->name }}</td>
+                                    <td class="text-capitalize">{{ $bid->case->title }}</td>
+                                    <td class="text-capitalize">{{ $bid->lawyer->user->name }}</td>
+                                    <td class="text-capitalize">{{ $bid->fee }}</td>
+                                    <td class="text-capitalize">{{ \Carbon\Carbon::parse($bid->time_estimated)->format('j F, Y') }}</td>
+                                    <td class="text-capitalize">{{ $bid->status }}</td>
                                     <td>
                                         <form action="{{ route('bids.destroy', $bid->id) }}" method="POST">
                                             @method('DELETE')

@@ -32,12 +32,44 @@
                         </div>
                     @endif
 
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" class="form-control" value="{{ $consultation->name }}" disabled>
-                    </div>
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                <label for="client_id">Client</label>
+                                <select name="client_id" class="form-control select2" disabled>
+                                    <option value="{{ $consultation->client_id }}">{{ $consultation->client->user->name }}</option>
+                                </select>
+                            </div>
 
-                    <form action="{{ route('consultations.destroy', $consultation->id) }}" method="POST" class="mt-4">
+                            <div class="form-group col-md-4">
+                                <label for="lawyer_id">Lawyer</label>
+                                <select name="lawyer_id" class="form-control select2" disabled>
+                                    <option value="{{ $consultation->lawyer_id }}">{{ $consultation->lawyer->user->name }}</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label for="case_id">Case</label>
+                                <select name="case_id" class="form-control select2" disabled>
+                                    <option value="{{ $consultation->case_id }}">{{ $consultation->case->title }}</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="date_and_time">Date & Time</label>
+                                <input type="datetime-local" name="date_and_time" class="form-control"
+                                       value="{{ \Carbon\Carbon::parse($consultation->date_and_time)->format('Y-m-d\TH:i') }}" disabled>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="mode">Mode</label>
+                                <select name="mode" class="form-control" disabled>
+                                    <option value="physical" {{ $consultation->mode == 'physical' ? 'selected' : '' }}>Physical</option>
+                                    <option value="virtual" {{ $consultation->mode == 'virtual' ? 'selected' : '' }}>Virtual</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <form action="{{ route('consultations.destroy', $consultation->id) }}" method="POST" class="mt-4">
                         @csrf
                         @method('DELETE')
 

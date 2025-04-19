@@ -32,12 +32,45 @@
                         </div>
                     @endif
 
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" class="form-control" value="{{ $bid->name }}" disabled>
-                    </div>
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                <label for="case_id">Case</label>
+                                <select name="case_id" class="form-control select2" disabled>
+                                    <option value="{{ $bid->case_id }}">{{ $bid->case->title }}</option>
+                                </select>
+                            </div>
 
-                    <form action="{{ route('bids.destroy', $bid->id) }}" method="POST" class="mt-4">
+                            <div class="form-group col-md-4">
+                                <label for="lawyer_id">Lawyer</label>
+                                <select name="lawyer_id" class="form-control select2" disabled>
+                                    <option value="{{ $bid->lawyer->id }}">{{ $bid->lawyer->user->name }}</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label for="fee">Fees</label>
+                                <input type="number" name="fee" class="form-control" step="0.01" disabled
+                                       value="{{ old('fee', $bid->fee) }}" placeholder="Enter fees">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="time_estimated">Estimated Date</label>
+                                <input type="date" name="time_estimated" class="form-control" disabled
+                                       value="{{ old('time_estimated', $bid->time_estimated) }}">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="status">Case Status</label>
+                                <select name="status" class="form-control" disabled>
+                                    <option value="pending" {{ old('status', $bid->status) == 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="accepted" {{ old('status', $bid->status) == 'accepted' ? 'selected' : '' }}>Accepted</option>
+                                    <option value="rejected" {{ old('status', $bid->status) == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <form action="{{ route('bids.destroy', $bid->id) }}" method="POST" class="mt-4">
                         @csrf
                         @method('DELETE')
 

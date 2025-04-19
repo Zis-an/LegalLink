@@ -25,39 +25,52 @@
             @can('cases.list')
                 <div class="card">
                     <div class="card-body table-responsive">
+                        @if ($message = Session::get('success'))
+                            <div class="alert alert-success">{{ $message }}</div>
+                        @endif
                         <table id="casesList" class="table  dataTable table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Case</th>
-                                <th width="80px">Action</th>
+                                <th>Title</th>
+                                <th>Client</th>
+                                <th>Status</th>
+                                <th>Voice Note</th>
+                                <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($cases as $case)
+                            @foreach ($cases as $case)
                                 <tr>
-                                    <td class="text-capitalize">{{ $case->name }}</td>
+                                    <td>{{ $case->title }}</td>
+                                    <td>{{ $case->client->user->name }}</td>
                                     <td>
-                                        <form action="{{ route('cases.destroy', $case->id) }}" method="POST">
-                                            @method('DELETE')
+                                        @php
+                                            $badge = match($case->status) {
+                                                'open' => 'badge-primary',
+                                                'in_progress' => 'badge-warning',
+                                                'closed' => 'badge-success',
+                                                default => 'badge-secondary'
+                                            };
+                                        @endphp
+                                        <span class="badge {{ $badge }}">{{ ucfirst(str_replace('_', ' ', $case->status)) }}</span>
+                                    </td>
+                                    <td>
+                                        @if ($case->voice_note)
+                                            <audio controls style="width: 100px;">
+                                                <source src="{{ asset('storage/' . $case->voice_note) }}" type="audio/mpeg">
+                                                Not supported
+                                            </audio>
+                                        @else
+                                            <span class="text-muted">N/A</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('cases.show', $case->id) }}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></a>
+                                        <a href="{{ route('cases.edit', $case->id) }}" class="btn btn-warning btn-sm"><i class="fa fa-pen"></i></a>
+                                        <form action="{{ route('cases.destroy', $case->id) }}" method="POST" style="display:inline;">
                                             @csrf
-                                            @can('cases.show')
-                                                <a href="{{ route('cases.show',['case'=>$case->id]) }}"
-                                                   class="btn btn-info px-1 py-0 btn-sm">
-                                                    <i class="fa fa-eye"></i>
-                                                </a>
-                                            @endcan
-                                            @can('cases.update')
-                                                <a href="{{ route('cases.edit',['case'=>$case->id]) }}"
-                                                   class="btn btn-warning px-1 py-0 btn-sm">
-                                                    <i class="fa fa-pen"></i>
-                                                </a>
-                                            @endcan
-                                            @can('cases.delete')
-                                                <button onclick="isDelete(this)"
-                                                        class="btn btn-danger btn-sm px-1 py-0">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            @endcan
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure to delete this case?')"><i class="fa fa-trash"></i></button>
                                         </form>
                                     </td>
                                 </tr>

@@ -41,36 +41,40 @@
                             </div>
                         @endif
 
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input name="name" type="text" required class="form-control" id="name" value="{{ $user->name }}" placeholder="Enter user name">
-                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="name">Name</label>
+                                <input name="name" type="text" required class="form-control" id="name" value="{{ $user->name }}" placeholder="Enter user name">
+                            </div>
 
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input name="email" type="email" required class="form-control" id="email" value="{{ $user->email }}" placeholder="Enter email">
-                        </div>
-
-                        <div class="form-group position-relative">
-                            <label for="password">Password (Leave blank to keep current)</label>
-                            <div class="input-group">
-                                <input name="password" type="password" class="form-control" id="password" placeholder="Enter new password">
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-                                        <i class="fas fa-eye" id="eyeIcon"></i>
-                                    </button>
-                                </div>
+                            <div class="form-group col-md-6">
+                                <label for="email">Email</label>
+                                <input name="email" type="email" required class="form-control" id="email" value="{{ $user->email }}" placeholder="Enter email">
                             </div>
                         </div>
 
-                        <div class="form-group position-relative">
-                            <label for="confirm-password">Confirm Password</label>
-                            <div class="input-group">
-                                <input name="confirm-password" type="password" class="form-control" id="confirm-password" placeholder="Confirm new password">
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
-                                        <i class="fas fa-eye" id="eyeConfirmIcon"></i>
-                                    </button>
+                        <div class="row">
+                            <div class="form-group col-md-6 position-relative">
+                                <label for="password">Password (Leave blank to keep current)</label>
+                                <div class="input-group">
+                                    <input name="password" type="password" class="form-control" id="password" placeholder="Enter new password">
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                            <i class="fas fa-eye" id="eyeIcon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-6 position-relative">
+                                <label for="confirm-password">Confirm Password</label>
+                                <div class="input-group">
+                                    <input name="confirm-password" type="password" class="form-control" id="confirm-password" placeholder="Confirm new password">
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                                            <i class="fas fa-eye" id="eyeConfirmIcon"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

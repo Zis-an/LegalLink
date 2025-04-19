@@ -5,7 +5,7 @@
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>View Case - {{ $case->name }}</h1>
+            <h1>View Case - {{ $case->title }}</h1>
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -22,41 +22,51 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (count($errors) > 0)
-                        <div class = "alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="client_id">Client</label>
+                            <select name="client_id" class="form-control select2" disabled>
+                                <option>{{ $case->client->user->name }}</option>
+                            </select>
                         </div>
-                    @endif
 
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" class="form-control" value="{{ $case->name }}" disabled>
+                        <div class="form-group col-md-4">
+                            <label for="title">Case Title</label>
+                            <input type="text" name="title" class="form-control" value="{{ old('title', $case->title) }}" disabled>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="status">Case Status</label>
+                            <select name="status" class="form-control" disabled>
+                                <option value="open" {{ $case->status == 'open' ? 'selected' : '' }}>Open</option>
+                                <option value="in_progress" {{ $case->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                <option value="closed" {{ $case->status == 'closed' ? 'selected' : '' }}>Closed</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <form action="{{ route('cases.destroy', $case->id) }}" method="POST" class="mt-4">
-                        @csrf
-                        @method('DELETE')
 
-                        @can('cases.show')
-                            <a href="{{ route('cases.index') }}" class="btn btn-info btn-sm">Go Back</a>
-                        @endcan
 
-                        @can('cases.update')
-                            <a href="{{ route('cases.edit', $case->id) }}" class="btn btn-warning btn-sm">
-                                <i class="fa fa-pen"></i> Edit
-                            </a>
-                        @endcan
+                    <div class="form-group">
+                        <label for="description">Case Description</label>
+                        <textarea name="description" rows="4" class="form-control" required>{{ old('description', $case->description) }}</textarea>
+                    </div>
 
-                        @can('cases.delete')
-                            <button type="button" onclick="confirmDelete(this)" class="btn btn-danger btn-sm">
-                                <i class="fa fa-trash"></i> Delete
-                            </button>
-                        @endcan
-                    </form>
+                    <div class="form-group">
+                        <label for="voice_note">Voice Note</label><br>
+                        @if ($case->voice_note)
+                            <audio controls>
+                                <source src="{{ asset('storage/' . $case->voice_note) }}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                            <br>
+                        @endif
+                    </div>
+
+                    <div class="form-group">
+                        <a href="{{ route('cases.index') }}" class="btn btn-primary">Go Back</a>
+                        <a href="{{ route('cases.edit', $case->id) }}" class="btn btn-warning">Edit</a>
+                    </div>
                 </div>
             </div>
         </div>

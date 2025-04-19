@@ -28,14 +28,26 @@
                         <table id="consultationsList" class="table  dataTable table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Consultation</th>
-                                <th width="80px">Action</th>
+                                <th>Client</th>
+                                <th>Lawyer</th>
+                                <th>Case</th>
+                                <th>Date & Time</th>
+                                <th>Mode</th>
+                                <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($consultations as $consultation)
                                 <tr>
-                                    <td class="text-capitalize">{{ $consultation->name }}</td>
+                                    <td>{{ $consultation->client->user->name }}</td>
+                                    <td>{{ $consultation->lawyer->user->name }}</td>
+                                    <td>{{ $consultation->case->title }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($consultation->date_and_time)->format('d M Y, h:i A') }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ $consultation->mode === 'virtual' ? 'info' : 'secondary' }}">
+                                            {{ ucfirst($consultation->mode) }}
+                                        </span>
+                                    </td>
                                     <td>
                                         <form action="{{ route('consultations.destroy', $consultation->id) }}" method="POST">
                                             @method('DELETE')

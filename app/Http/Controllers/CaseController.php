@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use Illuminate\Http\Request;
 use App\Models\Lawsuit;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -19,57 +21,90 @@ class CaseController extends Controller
 
     public function index(Request $request): View
     {
-        $cases = Lawsuit::orderBy('id','DESC')->paginate(5);
+        $cases = Lawsuit::with('client.user')->latest()->paginate(10);;
         return view('cases.index', compact('cases'))->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
     public function create(): View
     {
-        return view('cases.create');
+        $clients = Client::with('user')->get();
+        return view('cases.create', compact('clients'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-
+            'client_id' => 'required|exists:clients,id',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'voice_note' => 'nullable|file|mimes:mp3,wav',
+            'status' => 'required|in:open,in_progress,closed',
         ]);
 
-        $case = Lawsuit::create([
-            'name' => $request->name,
+        $path = null;
+        if ($request->hasFile('voice_note')) {
+            $path = $request->file('voice_note')->store('cases', 'public');
+        }
+
+        Lawsuit::create([
+            'client_id' => $request->client_id,
+            'title' => $request->title,
+            'description' => $request->description,
+            'voice_note' => $path,
+            'status' => $request->status,
         ]);
 
         return redirect()->route('cases.index')->with('success', 'Case created successfully');
     }
 
-    public function show($id): View
+    public function show(Lawsuit $case)
     {
-        $case = Lawsuit::findOrFail($id);
-
+        $case->load('client.user');
         return view('cases.show', compact('case'));
     }
 
-    public function edit($id): View
+    public function edit(Lawsuit $case)
     {
-        $case = Lawsuit::findOrFail($id);
-        return view('cases.edit', compact('case'));
+        $clients = Client::with('user')->get();
+        return view('cases.edit', compact('case', 'clients'));
     }
 
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, Lawsuit $case)
     {
         $request->validate([
-            'name' => 'required',
+            'client_id' => 'required|exists:clients,id',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'voice_note' => 'nullable|file|mimes:mp3,wav',
+            'status' => 'required|in:open,in_progress,closed',
         ]);
 
-        $case = Lawsuit::findOrFail($id);
-        $case->name = $request->name;
-        $case->save();
+        if ($request->hasFile('voice_note')) {
+            if ($case->voice_note && Storage::disk('public')->exists($case->voice_note)) {
+                Storage::disk('public')->delete($case->voice_note);
+            }
 
-        return redirect()->route('cases.index')->with('success', 'Case updated successfully');
+            $case->voice_note = $request->file('voice_note')->store('cases', 'public');
+        }
+
+        $case->update([
+            'client_id' => $request->client_id,
+            'title' => $request->title,
+            'description' => $request->description,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('cases.index')->with('success', 'Case updated successfully.');
     }
 
-    public function destroy($id): RedirectResponse
+    public function destroy(Lawsuit $case)
     {
-        Lawsuit::findOrFail($id)->delete();
-        return redirect()->route('cases.index')->with('success', 'Case deleted successfully');
+        if ($case->voice_note && Storage::disk('public')->exists($case->voice_note)) {
+            Storage::disk('public')->delete($case->voice_note);
+        }
+
+        $case->delete();
+
+        return redirect()->route('cases.index')->with('success', 'Case deleted successfully.');
     }
 }

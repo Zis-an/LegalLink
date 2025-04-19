@@ -10,6 +10,18 @@ class Bid extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'case_id',
+        'lawyer_id',
+        'fee',
+        'time_estimated',
+        'status',
     ];
+
+    public function case(){
+        return $this->belongsTo(Lawsuit::class, 'case_id');
+    }
+
+    public function lawyer(){
+        return $this->belongsTo(Lawyer::class, 'lawyer_id');
+    }
 }
