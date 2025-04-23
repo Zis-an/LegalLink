@@ -36,7 +36,7 @@
                         @endif
 
                         <div class="row">
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label for="client_id">Client</label>
                                 <select name="client_id" class="form-control select2" required>
                                     <option value="">Select client</option>
@@ -48,7 +48,7 @@
                                 </select>
                             </div>
 
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label for="lawyer_id">Lawyer</label>
                                 <select name="lawyer_id" class="form-control select2" required>
                                     <option value="">Select lawyer</option>
@@ -60,7 +60,7 @@
                                 </select>
                             </div>
 
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label for="case_id">Case</label>
                                 <select name="case_id" class="form-control select2" required>
                                     <option value="">Select case</option>
@@ -69,6 +69,16 @@
                                             {{ $case->title }}
                                         </option>
                                     @endforeach
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label for="status">Status</label>
+                                <select name="status" class="form-control" required>
+                                    <option value="">Select status</option>
+                                    <option value="Scheduled" {{ old('status') == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                    <option value="Completed" {{ old('status') == 'Completed' ? 'selected' : '' }}>Completed</option>
+                                    <option value="Missed" {{ old('status') == 'Missed' ? 'selected' : '' }}>Missed</option>
                                 </select>
                             </div>
 
@@ -86,6 +96,7 @@
                                     <option value="virtual" {{ old('mode') == 'virtual' ? 'selected' : '' }}>Virtual</option>
                                 </select>
                             </div>
+
                         </div>
 
                         @can('consultations.create')

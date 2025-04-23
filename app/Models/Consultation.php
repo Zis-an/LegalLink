@@ -14,7 +14,8 @@ class Consultation extends Model
         'lawyer_id',
         'case_id',
         'date_and_time',
-        'mode'
+        'mode',
+        'status'
     ];
 
     public function client()

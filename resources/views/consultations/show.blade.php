@@ -67,6 +67,15 @@
                                     <option value="virtual" {{ $consultation->mode == 'virtual' ? 'selected' : '' }}>Virtual</option>
                                 </select>
                             </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="status">Status</label>
+                                <select name="status" class="form-control" disabled>
+                                    <option value="Scheduled" {{ $consultation->status == 'Scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                    <option value="Completed" {{ $consultation->status == 'Completed' ? 'selected' : '' }}>Completed</option>
+                                    <option value="Missed" {{ $consultation->status == 'Missed' ? 'selected' : '' }}>Missed</option>
+                                </select>
+                            </div>
                         </div>
 
                         <form action="{{ route('consultations.destroy', $consultation->id) }}" method="POST" class="mt-4">

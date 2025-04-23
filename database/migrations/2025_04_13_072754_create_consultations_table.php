@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreign('case_id')->references('id')->on('lawsuits')->onDelete('cascade');
             $table->dateTime('date_and_time');
             $table->enum('mode', ['virtual', 'physical'])->default('physical');
+            $table->enum('status', ['Scheduled', 'Completed', 'Missed'])->default('Scheduled');
             $table->timestamps();
         });
     }

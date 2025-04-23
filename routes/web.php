@@ -4,6 +4,7 @@ use App\Http\Controllers\BidController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\LawyerController;
+use App\Http\Controllers\LawyerVerificationController;
 use App\Http\Controllers\PermissionController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('clients', ClientController::class);
     Route::resource('consultations', ConsultationController::class);
     Route::resource('lawyers', LawyerController::class);
+    Route::resource('lawyer-verifications', LawyerVerificationController::class);
 });
 
 // 👇 Restrict user management to only admin

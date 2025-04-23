@@ -55,6 +55,7 @@ class ConsultationController extends Controller
             'case_id' => 'required|exists:lawsuits,id',
             'date_and_time' => 'required|date_format:Y-m-d\TH:i', // for datetime-local HTML input
             'mode' => 'required|in:virtual,physical',
+            'status' => 'required|in:Scheduled,Completed,Missed',
         ]);
 
         $consultation = Consultation::create([
@@ -63,6 +64,7 @@ class ConsultationController extends Controller
             'case_id' => $request->case_id,
             'date_and_time' => $request->date_and_time,
             'mode' => $request->mode,
+            'status' => $request->status,
         ]);
 
         return redirect()->route('consultations.index')->with('success', 'Consultation created successfully');
@@ -105,6 +107,7 @@ class ConsultationController extends Controller
             'case_id' => 'required|exists:lawsuits,id',
             'date_and_time' => 'required|date_format:Y-m-d\TH:i', // match datetime-local input
             'mode' => 'required|in:virtual,physical',
+            'status' => 'required|in:Scheduled,Completed,Missed',
         ]);
 
         $consultation = Consultation::findOrFail($id);
@@ -115,6 +118,7 @@ class ConsultationController extends Controller
             'case_id' => $request->case_id,
             'date_and_time' => $request->date_and_time,
             'mode' => $request->mode,
+            'status' => $request->status,
         ]);
 
         return redirect()->route('consultations.index')->with('success', 'Consultation updated successfully');
