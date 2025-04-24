@@ -30,7 +30,7 @@ class BidController extends Controller
     {
         if (Auth::user()->hasRole('admin')) {
             $lawyers = Lawyer::with('user')->get(); // Show all lawyers to admin
-        } elseif (Auth::user()->hasRole('Lawyer')) {
+        } elseif (Auth::user()->hasRole('lawyer')) {
             $lawyers = Lawyer::with('user')
                 ->where('user_id', Auth::id()) // Only self for lawyer
                 ->get();
@@ -75,7 +75,7 @@ class BidController extends Controller
 
         if (Auth::user()->hasRole('admin')) {
             $lawyers = Lawyer::with('user')->get(); // Show all lawyers to admin
-        } elseif (Auth::user()->hasRole('Lawyer')) {
+        } elseif (Auth::user()->hasRole('lawyer')) {
             $lawyers = Lawyer::with('user')
                 ->where('user_id', Auth::id()) // Only self for lawyer
                 ->get();

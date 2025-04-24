@@ -35,6 +35,15 @@
                             <input type="text" name="title" class="form-control" value="{{ old('title', $case->title) }}" disabled>
                         </div>
 
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Category:</strong> {{ $case->category }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Subcategory:</strong> {{ $case->subcategory }}
+                            </div>
+                        </div>
+
                         <div class="form-group col-md-4">
                             <label for="status">Case Status</label>
                             <select name="status" class="form-control" disabled>

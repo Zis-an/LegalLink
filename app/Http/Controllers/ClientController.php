@@ -108,4 +108,30 @@ class ClientController extends Controller
 
         return redirect()->route('clients.index')->with('success', 'Client deleted successfully');
     }
+
+    public function searchByEmail(Request $request)
+    {
+        $search = $request->input('q');
+
+        if (!$search || !filter_var($search, FILTER_VALIDATE_EMAIL)) {
+            return response()->json([]); // only search if it's a valid email
+        }
+
+        $client = Client::with('user')
+            ->whereHas('user', function ($query) use ($search) {
+                $query->whereRaw('LOWER(email) = ?', [strtolower($search)]);
+            })
+            ->first();
+
+        if (!$client) {
+            return response()->json([]);
+        }
+
+        return response()->json([
+            [
+                'id' => $client->id,
+                'text' => $client->user->name . ' (' . $client->user->email . ')'
+            ]
+        ]);
+    }
 }

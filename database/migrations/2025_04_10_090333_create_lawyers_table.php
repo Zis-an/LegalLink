@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('practice_area');
             $table->string('chamber_name');
             $table->text('chamber_address');
-            $table->string('photo');
+            $table->string('photo')->nullable();
             $table->timestamps();
         });
     }

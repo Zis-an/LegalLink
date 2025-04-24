@@ -25,7 +25,7 @@
                         <div class="alert alert-success">{{ $message }}</div>
                     @endif
                     <a href="{{ route('users.create') }}" class="btn btn-primary mb-3">Create User</a>
-                    <table class="table table-bordered table-striped">
+                    <table id="usersList" class="table table-bordered table-striped">
                         <thead>
                         <tr>
                             <th>Name</th>
@@ -63,8 +63,6 @@
                         @endforeach
                         </tbody>
                     </table>
-
-                    {!! $data->links() !!}
                 </div>
             </div>
         </div>
@@ -77,5 +75,27 @@
 @section('css')
 @stop
 
+@section('plugins.Datatables', true)
+
 @section('js')
+    <script>
+        $(document).ready(function () {
+            $('#usersList').DataTable({
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                ordering: true,
+                info: true,
+                pageLength: 10,
+                language: {
+                    paginate: {
+                        first: "First",
+                        previous: "Previous",
+                        next: "Next",
+                        last: "Last"
+                    }
+                }
+            });
+        });
+    </script>
 @stop

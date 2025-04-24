@@ -21,13 +21,39 @@ class CaseController extends Controller
 
     public function index(Request $request): View
     {
-        $cases = Lawsuit::with('client.user')->latest()->paginate(10);;
+        $user = auth()->user();
+
+        if ($user->hasRole('client')) {
+            // Get only cases for this client
+            $client = Client::where('user_id', $user->id)->first();
+
+            $cases = Lawsuit::with('client.user')
+                ->where('client_id', $client->id)
+                ->latest()
+                ->paginate(10);
+        } else {
+            // Admins or other roles see all cases
+            $cases = Lawsuit::with('client.user')->latest()->paginate(10);
+        }
+
         return view('cases.index', compact('cases'))->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
     public function create(): View
     {
-        $clients = Client::with('user')->get();
+        $user = auth()->user();
+
+        if ($user->hasRole('client')) {
+            $client = Client::with('user')->where('user_id', $user->id)->first();
+            $clients = collect([$client]);
+        } elseif ($user->hasRole('admin')) {
+            $clients = Client::with('user')->get();
+        } elseif ($user->hasRole('lawyer')) {
+            // Show limited client list or none — let lawyer search in the form
+            $clients = collect(); // or pre-fill only frequent clients if needed
+        } else {
+            $clients = collect();
+        }
         return view('cases.create', compact('clients'));
     }
 
@@ -38,12 +64,29 @@ class CaseController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'voice_note' => 'nullable|file|mimes:mp3,wav',
+            'voice_note_blob' => 'nullable|string',
             'status' => 'required|in:open,in_progress,closed',
+            'category' => 'required|in:Civil,Criminal',
+            'subcategory' => 'required|string|max:255',
         ]);
 
         $path = null;
+
+        // Handle traditional file upload
         if ($request->hasFile('voice_note')) {
             $path = $request->file('voice_note')->store('cases', 'public');
+        }
+
+        // Handle base64 blob recording (webm)
+        if ($request->filled('voice_note_blob')) {
+            $base64Audio = $request->voice_note_blob;
+            $base64Str = preg_replace('/^data:audio\/webm;base64,/', '', $base64Audio);
+            $decoded = base64_decode($base64Str);
+
+            $filename = 'cases/' . uniqid() . '.webm';
+            Storage::disk('public')->put($filename, $decoded);
+
+            $path = $filename;
         }
 
         Lawsuit::create([
@@ -52,6 +95,8 @@ class CaseController extends Controller
             'description' => $request->description,
             'voice_note' => $path,
             'status' => $request->status,
+            'category' => $request->category,
+            'subcategory' => $request->subcategory,
         ]);
 
         return redirect()->route('cases.index')->with('success', 'Case created successfully');
@@ -77,6 +122,8 @@ class CaseController extends Controller
             'description' => 'required|string',
             'voice_note' => 'nullable|file|mimes:mp3,wav',
             'status' => 'required|in:open,in_progress,closed',
+            'category' => 'required|in:Civil,Criminal',
+            'subcategory' => 'required|string|max:255',
         ]);
 
         if ($request->hasFile('voice_note')) {
@@ -92,6 +139,8 @@ class CaseController extends Controller
             'title' => $request->title,
             'description' => $request->description,
             'status' => $request->status,
+            'category' => $request->category,
+            'subcategory' => $request->subcategory,
         ]);
 
         return redirect()->route('cases.index')->with('success', 'Case updated successfully.');

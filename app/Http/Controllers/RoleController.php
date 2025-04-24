@@ -40,7 +40,7 @@ class RoleController extends Controller
         ]);
 
         $role = Role::create([
-            'name' => $request->name,
+            'name' => strtolower($request->name),
             'guard_name' => $request->guard_name
         ]);
 
@@ -73,7 +73,7 @@ class RoleController extends Controller
         ]);
 
         $role = Role::findOrFail($id);
-        $role->name = $request->name;
+        $role->name = strtolower($request->name);
         $role->save();
 
         $role->syncPermissions($request->permissions);

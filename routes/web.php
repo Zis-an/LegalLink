@@ -30,6 +30,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('/api/clients/search-by-email', [ClientController::class, 'searchByEmail'])->name('clients.searchByEmail');
+
     // Resource routes for roles, users, and products
     Route::resource('roles', RoleController::class);
     Route::resource('permissions',PermissionController::class);

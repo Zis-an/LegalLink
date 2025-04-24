@@ -33,7 +33,7 @@ class ConsultationController extends Controller
             $lawyers = Lawyer::with('user')->get();
             $clients = Client::with('user')->get();
             $cases = Lawsuit::all();
-        } elseif (Auth::user()->hasRole('Lawyer')) {
+        } elseif (Auth::user()->hasRole('lawyer')) {
             $lawyers = Lawyer::with('user')
                 ->where('user_id', Auth::id()) // Only self for lawyer
                 ->get();
@@ -84,7 +84,7 @@ class ConsultationController extends Controller
             $lawyers = Lawyer::with('user')->get();
             $clients = Client::with('user')->get();
             $cases = Lawsuit::all();
-        } elseif (Auth::user()->hasRole('Lawyer')) {
+        } elseif (Auth::user()->hasRole('lawyer')) {
             $lawyers = Lawyer::with('user')
                 ->where('user_id', Auth::id()) // Only self for lawyer
                 ->get();

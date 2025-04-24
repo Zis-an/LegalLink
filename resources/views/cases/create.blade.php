@@ -38,13 +38,18 @@
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="client_id">Client</label>
-                                <select name="client_id" class="form-control select2" required>
-                                    @foreach ($clients as $client)
-                                        <option value="{{ $client->id }}" {{ old('client_id') == $client->id ? 'selected' : '' }}>
-                                            {{ $client->user->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+
+                                @if ($clients->isNotEmpty())
+                                    <select name="client_id" class="form-control select2" required>
+                                        @foreach ($clients as $client)
+                                            <option value="{{ $client->id }}" {{ old('client_id') == $client->id ? 'selected' : '' }}>
+                                                {{ $client->user->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <select name="client_id" id="clientSelect" class="form-control select2" required></select>
+                                @endif
                             </div>
 
                             <div class="form-group col-md-4">
@@ -60,6 +65,25 @@
                                     <option value="closed" {{ old('status') == 'closed' ? 'selected' : '' }}>Closed</option>
                                 </select>
                             </div>
+
+                            {{-- Category --}}
+                            <div class="form-group col-md-6">
+                                <label for="category">Case Category</label>
+                                <select name="category" id="category" class="form-control" required>
+                                    <option value="">-- Select Category --</option>
+                                    <option value="Civil" {{ old('category') == 'Civil' ? 'selected' : '' }}>Civil</option>
+                                    <option value="Criminal" {{ old('category') == 'Criminal' ? 'selected' : '' }}>Criminal</option>
+                                </select>
+                            </div>
+
+                            {{-- Subcategory --}}
+                            <div class="form-group col-md-6">
+                                <label for="subcategory">Case Subcategory</label>
+                                <select name="subcategory" id="subcategory" class="form-control" required>
+                                    <option value="">-- Select Subcategory --</option>
+                                    {{-- Options populated by JS --}}
+                                </select>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -69,7 +93,17 @@
 
                         <div class="form-group">
                             <label for="voice_note">Voice Note</label>
-                            <input type="file" name="voice_note" class="form-control" accept="audio/*" required>
+
+                            <div id="recorder-container" class="text-center">
+                                <button type="button" id="recordBtn" class="btn btn-light border border-secondary rounded-circle p-4 mb-2 shadow-sm">
+                                    <i class="fas fa-microphone fa-lg text-danger" id="recordIcon"></i>
+                                </button>
+                                <p id="recording-status" class="text-danger" style="display: none;">Recording... Tap again to stop</p>
+
+                                <audio id="audioPlayback" controls style="display: none; width: 100%;"></audio>
+                            </div>
+
+                            <input type="hidden" name="voice_note_blob" id="voice_note_blob">
                         </div>
 
                         <button type="submit" class="btn btn-success">Create Case</button>
@@ -84,6 +118,15 @@
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
     <style>
+        #recorder-container button {
+            width: 80px;
+            height: 80px;
+        }
+
+        #recordBtn:hover {
+            background-color: #f5f5f5;
+        }
+
         .select2-container .select2-selection--single {
             box-sizing: border-box;
             cursor: pointer;
@@ -129,6 +172,177 @@
                 placeholder: "Select a client",
                 allowClear: true
             });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#clientSelect').select2({
+                placeholder: 'Enter client email...',
+                ajax: {
+                    url: '{{ route("clients.searchByEmail") }}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 5
+            });
+        });
+    </script>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let wavesurfer;
+
+        const recordBtn = document.getElementById('recordBtn');
+        const recordIcon = document.getElementById('recordIcon');
+        const statusText = document.getElementById('recording-status');
+        const audioPlayback = document.getElementById('audioPlayback');
+        const hiddenInput = document.getElementById('voice_note_blob');
+
+        function initWaveSurfer(blobUrl = null) {
+            if (wavesurfer) {
+                wavesurfer.destroy();
+            }
+
+            if (blobUrl) {
+                wavesurfer.load(blobUrl);
+            }
+        }
+
+        recordBtn.addEventListener('click', async () => {
+            if (!isRecording) {
+                if (!navigator.mediaDevices) {
+                    alert("Your browser doesn't support audio recording.");
+                    return;
+                }
+
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                    mediaRecorder = new MediaRecorder(stream, {
+                        mimeType: 'audio/webm'
+                    });
+
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+
+                        audioPlayback.src = audioUrl;
+                        audioPlayback.style.display = 'block';
+
+                        // Encode to base64
+                        const reader = new FileReader();
+                        reader.readAsDataURL(audioBlob);
+                        reader.onloadend = function () {
+                            hiddenInput.value = reader.result;
+                        };
+                    };
+
+                    mediaRecorder.start(); // no timeslice, no limit
+                    isRecording = true;
+
+                    statusText.style.display = 'block';
+                    audioPlayback.style.display = 'none';
+                    hiddenInput.value = '';
+
+                    // Change icon
+                    recordIcon.classList.remove('fa-microphone');
+                    recordIcon.classList.add('fa-stop');
+                    recordIcon.classList.remove('text-danger');
+                    recordIcon.classList.add('text-dark');
+
+                    // Stop automatically after 30 minutes (safety)
+                    setTimeout(() => {
+                        if (isRecording) {
+                            mediaRecorder.stop();
+                            isRecording = false;
+                            statusText.style.display = 'none';
+                            recordIcon.classList.add('fa-microphone');
+                            recordIcon.classList.remove('fa-stop');
+                            recordIcon.classList.add('text-danger');
+                            recordIcon.classList.remove('text-dark');
+                        }
+                    }, 1800000); // 30 mins
+                } catch (err) {
+                    alert("Could not start recording: " + err.message);
+                }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                statusText.style.display = 'none';
+
+                recordIcon.classList.add('fa-microphone');
+                recordIcon.classList.remove('fa-stop');
+                recordIcon.classList.add('text-danger');
+                recordIcon.classList.remove('text-dark');
+            }
+        });
+    </script>
+    <script>
+        const subcategories = {
+            Civil: [
+                'Property Disputes',
+                'Contract Disputes',
+                'Personal Injury',
+                'Financial Disputes',
+                'Family Law',
+                'Administrative Suits'
+            ],
+            Criminal: [
+                'Crimes Against Humanity',
+                'Crimes Against Property',
+                'Crimes Against Persons',
+                'Crimes Related to Narcotics',
+                'Other Crimes'
+            ]
+        };
+
+        function populateSubcategories(category, selected = null) {
+            const subcategorySelect = document.getElementById('subcategory');
+            subcategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
+
+            if (subcategories[category]) {
+                subcategories[category].forEach(sub => {
+                    const opt = document.createElement('option');
+                    opt.value = sub;
+                    opt.text = sub;
+                    if (sub === selected) opt.selected = true;
+                    subcategorySelect.appendChild(opt);
+                });
+            }
+        }
+
+        document.getElementById('category').addEventListener('change', function () {
+            populateSubcategories(this.value);
+        });
+
+        // Auto-fill on page load if old values exist
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectedCategory = "{{ old('category') }}";
+            const selectedSub = "{{ old('subcategory') }}";
+            if (selectedCategory) {
+                populateSubcategories(selectedCategory, selectedSub);
+            }
         });
     </script>
 @stop

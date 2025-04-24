@@ -61,6 +61,22 @@
                                     <option value="closed" {{ $case->status == 'closed' ? 'selected' : '' }}>Closed</option>
                                 </select>
                             </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="category">Case Category</label>
+                                <select name="category" id="category" class="form-control" required>
+                                    <option value="">-- Select Category --</option>
+                                    <option value="Civil" {{ old('category', $lawsuit->category ?? '') == 'Civil' ? 'selected' : '' }}>Civil</option>
+                                    <option value="Criminal" {{ old('category', $lawsuit->category ?? '') == 'Criminal' ? 'selected' : '' }}>Criminal</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="subcategory">Case Subcategory</label>
+                                <select name="subcategory" id="subcategory" class="form-control" required>
+                                    <option value="">-- Select Subcategory --</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -68,18 +84,18 @@
                             <textarea name="description" rows="4" class="form-control" required>{{ old('description', $case->description) }}</textarea>
                         </div>
 
-                        <div class="form-group">
-                            <label for="voice_note">Voice Note</label><br>
-                            @if ($case->voice_note)
-                                <audio controls>
-                                    <source src="{{ asset('storage/' . $case->voice_note) }}" type="audio/mpeg">
-                                    Your browser does not support the audio element.
-                                </audio>
-                                <br>
-                            @endif
-                            <input type="file" name="voice_note" class="form-control mt-2" accept="audio/*">
-                            <small class="text-muted">Leave blank if you don't want to change the voice note</small>
-                        </div>
+{{--                        <div class="form-group">--}}
+{{--                            <label for="voice_note">Voice Note</label><br>--}}
+{{--                            @if ($case->voice_note)--}}
+{{--                                <audio controls>--}}
+{{--                                    <source src="{{ asset('storage/' . $case->voice_note) }}" type="audio/mpeg">--}}
+{{--                                    Your browser does not support the audio element.--}}
+{{--                                </audio>--}}
+{{--                                <br>--}}
+{{--                            @endif--}}
+{{--                            <input type="file" name="voice_note" class="form-control mt-2" accept="audio/*">--}}
+{{--                            <small class="text-muted">Leave blank if you don't want to change the voice note</small>--}}
+{{--                        </div>--}}
 
                         <button type="submit" class="btn btn-success">Update Case</button>
                         <a href="{{ route('cases.index') }}" class="btn btn-secondary">Cancel</a>
@@ -134,6 +150,53 @@
     <script>
         $(document).ready(function () {
             $('.select2').select2();
+        });
+    </script>
+    <script>
+        const subcategories = {
+            Civil: [
+                'Property Disputes',
+                'Contract Disputes',
+                'Personal Injury',
+                'Financial Disputes',
+                'Family Law',
+                'Administrative Suits'
+            ],
+            Criminal: [
+                'Crimes Against Humanity',
+                'Crimes Against Property',
+                'Crimes Against Persons',
+                'Crimes Related to Narcotics',
+                'Other Crimes'
+            ]
+        };
+
+        function populateSubcategories(category, selected = null) {
+            const subcategorySelect = document.getElementById('subcategory');
+            subcategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
+
+            if (subcategories[category]) {
+                subcategories[category].forEach(sub => {
+                    const opt = document.createElement('option');
+                    opt.value = sub;
+                    opt.text = sub;
+                    if (sub === selected) opt.selected = true;
+                    subcategorySelect.appendChild(opt);
+                });
+            }
+        }
+
+        document.getElementById('category').addEventListener('change', function () {
+            populateSubcategories(this.value);
+        });
+
+        // Auto-populate on edit page
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectedCategory = document.getElementById('category').value;
+            const selectedSub = "{{ old('subcategory', $lawsuit->subcategory ?? '') }}";
+            if (selectedCategory) {
+                populateSubcategories(selectedCategory, selectedSub);
+            }
         });
     </script>
 @stop

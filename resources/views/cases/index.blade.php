@@ -33,6 +33,8 @@
                             <tr>
                                 <th>Title</th>
                                 <th>Client</th>
+                                <th>Category</th>
+                                <th>Subcategory</th>
                                 <th>Status</th>
                                 <th>Voice Note</th>
                                 <th>Actions</th>
@@ -43,6 +45,8 @@
                                 <tr>
                                     <td>{{ $case->title }}</td>
                                     <td>{{ $case->client->user->name }}</td>
+                                    <td>{{ $case->category }}</td>
+                                    <td>{{ $case->subcategory }}</td>
                                     <td>
                                         @php
                                             $badge = match($case->status) {

@@ -22,7 +22,15 @@ class LawyerVerificationController extends Controller
 
     public function index(Request $request): View
     {
-        $verifications = LawyerVerification::with(['lawyer.user', 'reviewer'])->latest()->paginate(10);;
+        if (auth()->user()->hasRole('lawyer')) {
+            // Only show current lawyer's own verifications
+            $lawyer = auth()->user()->lawyer;
+            $verifications = LawyerVerification::where('lawyer_id', $lawyer->id)->get();
+        } else {
+            // Admins see all
+            $verifications = LawyerVerification::all();
+        }
+
         return view('lawyer_verifications.index', compact('verifications'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
     }

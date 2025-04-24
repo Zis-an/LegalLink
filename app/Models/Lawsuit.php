@@ -15,6 +15,8 @@ class Lawsuit extends Model
         'description',
         'voice_note',
         'status',
+        'category',
+        'subcategory'
     ];
 
     public function client()

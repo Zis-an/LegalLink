@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('case_id');
             $table->unsignedBigInteger('lawyer_id');
-            $table->foreign('case_id')->references('id')->on('lawsuits')->onDelete('restrict');
-            $table->foreign('lawyer_id')->references('id')->on('lawyers')->onDelete('restrict');
+            $table->foreign('case_id')->references('id')->on('lawsuits')->onDelete('cascade');
+            $table->foreign('lawyer_id')->references('id')->on('lawyers')->onDelete('cascade');
             $table->decimal('fee');
             $table->date('time_estimated');
             $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
