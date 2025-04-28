@@ -20,75 +20,77 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+            @can('lawyers.show')
+                <div class="card">
+                    <div class="card-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label>Name</label>
-                            <input type="text" class="form-control" value="{{ $lawyer->user->name }}" disabled>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label>Name</label>
+                                <input type="text" class="form-control" value="{{ $lawyer->user->name }}" disabled>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Email</label>
+                                <input type="text" class="form-control" value="{{ $lawyer->user->email }}" disabled>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Bar ID</label>
+                                <input type="text" class="form-control" value="{{ $lawyer->bar_id }}" disabled>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Practice Area</label>
+                                <input type="text" class="form-control" value="{{ $lawyer->practice_area }}" disabled>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Chamber Name</label>
+                                <input type="text" class="form-control" value="{{ $lawyer->chamber_name }}" disabled>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Chamber Address</label>
+                                <textarea class="form-control" rows="2" disabled>{{ $lawyer->chamber_address }}</textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Photo</label><br>
+                                @if ($lawyer->photo)
+                                    <img src="{{ asset('storage/' . $lawyer->photo) }}" class="img-thumbnail" width="120">
+                                @else
+                                    <p class="text-muted">No photo</p>
+                                @endif
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Email</label>
-                            <input type="text" class="form-control" value="{{ $lawyer->user->email }}" disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Bar ID</label>
-                            <input type="text" class="form-control" value="{{ $lawyer->bar_id }}" disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Practice Area</label>
-                            <input type="text" class="form-control" value="{{ $lawyer->practice_area }}" disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Chamber Name</label>
-                            <input type="text" class="form-control" value="{{ $lawyer->chamber_name }}" disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Chamber Address</label>
-                            <textarea class="form-control" rows="2" disabled>{{ $lawyer->chamber_address }}</textarea>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Photo</label><br>
-                            @if ($lawyer->photo)
-                                <img src="{{ asset('storage/' . $lawyer->photo) }}" class="img-thumbnail" width="120">
-                            @else
-                                <p class="text-muted">No photo</p>
-                            @endif
-                        </div>
+
+                        <form action="{{ route('lawyers.destroy', $lawyer->id) }}" method="POST" class="mt-4">
+                            @csrf
+                            @method('DELETE')
+
+                            @can('lawyers.list')
+                                <a href="{{ route('lawyers.index') }}" class="btn btn-info btn-sm">Go Back</a>
+                            @endcan
+
+                            @can('lawyers.update')
+                                <a href="{{ route('users.edit', $lawyer->user_id) }}" class="btn btn-warning btn-sm">
+                                    <i class="fa fa-pen"></i> Edit
+                                </a>
+                            @endcan
+
+                            @can('lawyers.delete')
+                                <button type="button" onclick="isDelete(this)" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-trash"></i> Delete
+                                </button>
+                            @endcan
+                        </form>
                     </div>
-
-                    <form action="{{ route('lawyers.destroy', $lawyer->id) }}" method="POST" class="mt-4">
-                        @csrf
-                        @method('DELETE')
-
-                        @can('lawyers.show')
-                            <a href="{{ route('lawyers.index') }}" class="btn btn-info btn-sm">Go Back</a>
-                        @endcan
-
-                        @can('lawyers.update')
-                            <a href="{{ route('users.edit', $lawyer->user_id) }}" class="btn btn-warning btn-sm">
-                                <i class="fa fa-pen"></i> Edit
-                            </a>
-                        @endcan
-
-                        @can('lawyers.delete')
-                            <button type="button" onclick="isDelete(this)" class="btn btn-danger btn-sm">
-                                <i class="fa fa-trash"></i> Delete
-                            </button>
-                        @endcan
-                    </form>
                 </div>
-            </div>
+            @endcan
         </div>
     </div>
 @stop

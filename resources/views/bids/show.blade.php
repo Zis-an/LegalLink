@@ -20,17 +20,18 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    @if (count($errors) > 0)
-                        <div class = "alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+            @can('bids.show')
+                <div class="card">
+                    <div class="card-body">
+                        @if (count($errors) > 0)
+                            <div class = "alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
 
                         <div class="row">
                             <div class="form-group col-md-4">
@@ -71,27 +72,28 @@
 
 
                         <form action="{{ route('bids.destroy', $bid->id) }}" method="POST" class="mt-4">
-                        @csrf
-                        @method('DELETE')
+                            @csrf
+                            @method('DELETE')
 
-                        @can('bids.show')
-                            <a href="{{ route('bids.index') }}" class="btn btn-info btn-sm">Go Back</a>
-                        @endcan
+                            @can('bids.list')
+                                <a href="{{ route('bids.index') }}" class="btn btn-info btn-sm">Go Back</a>
+                            @endcan
 
-                        @can('bids.update')
-                            <a href="{{ route('bids.edit', $bid->id) }}" class="btn btn-warning btn-sm">
-                                <i class="fa fa-pen"></i> Edit
-                            </a>
-                        @endcan
+                            @can('bids.update')
+                                <a href="{{ route('bids.edit', $bid->id) }}" class="btn btn-warning btn-sm">
+                                    <i class="fa fa-pen"></i> Edit
+                                </a>
+                            @endcan
 
-                        @can('bids.delete')
-                            <button type="button" onclick="confirmDelete(this)" class="btn btn-danger btn-sm">
-                                <i class="fa fa-trash"></i> Delete
-                            </button>
-                        @endcan
-                    </form>
+                            @can('bids.delete')
+                                <button type="button" onclick="confirmDelete(this)" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-trash"></i> Delete
+                                </button>
+                            @endcan
+                        </form>
+                    </div>
                 </div>
-            </div>
+            @endcan
         </div>
     </div>
 @stop

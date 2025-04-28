@@ -20,55 +20,59 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <form action="{{ route('roles.store') }}" method="POST">
-                        @csrf
+            @can('roles.create')
+                <div class="card">
+                    <div class="card-body">
+                        <form action="{{ route('roles.store') }}" method="POST">
+                            @csrf
 
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
 
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input name="name" type="text" required class="form-control" id="name" placeholder="Enter role name">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="guard_name">Guard name</label>
-                            <input name="guard_name" type="text" value="web" required class="form-control" id="guard_name" readonly>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="custom-control custom-checkbox mb-2">
-                                <input type="checkbox" class="custom-control-input" id="select_all">
-                                <label class="custom-control-label" for="select_all">Select All Permissions</label>
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input name="name" type="text" required class="form-control" id="name" placeholder="Enter role name">
                             </div>
 
-                            <div class="row permissions">
-                                @foreach($permissions as $permission)
-                                    <div class="col-md-4">
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input permission-checkbox" id="permission_{{ $permission->id }}" name="permissions[]" value="{{ $permission->name }}">
-                                            <label class="custom-control-label" for="permission_{{ $permission->id }}">{{ $permission->name }}</label>
+                            <div class="form-group">
+                                <label for="guard_name">Guard name</label>
+                                <input name="guard_name" type="text" value="web" required class="form-control" id="guard_name" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox mb-2">
+                                    <input type="checkbox" class="custom-control-input" id="select_all">
+                                    <label class="custom-control-label" for="select_all">Select All Permissions</label>
+                                </div>
+
+                                <div class="row permissions">
+                                    @foreach($permissions as $permission)
+                                        <div class="col-md-4">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input permission-checkbox" id="permission_{{ $permission->id }}" name="permissions[]" value="{{ $permission->name }}">
+                                                <label class="custom-control-label" for="permission_{{ $permission->id }}">{{ $permission->name }}</label>
+                                            </div>
                                         </div>
-                                    </div>
-                                @endforeach
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
 
-                        @can('roles.create')
-                            <button class="btn btn-success" type="submit">Create</button>
-                        @endcan
-                    </form>
+                            @can('roles.create')
+                                <button class="btn btn-success" type="submit">Create</button>
+                            @endcan
+
+                            <a href="{{ route('roles.index') }}" class="btn btn-secondary">Cancel</a>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            @endcan
         </div>
     </div>
 @stop

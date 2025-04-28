@@ -21,7 +21,12 @@ class LawyerController extends Controller
 
     public function index(Request $request): View
     {
-        $lawyers = Lawyer::with('user')->orderByDesc('id')->paginate(5);
+        if( in_array('lawyer', auth()->user()->roles->pluck('name')->toArray() ) ) {
+            $lawyers = Lawyer::with('user')->where('user_id', auth()->id())->get();
+        } else {
+            $lawyers = Lawyer::with('user')->orderByDesc('id')->paginate(5);
+        }
+
         return view('lawyers.index', compact('lawyers'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
     }

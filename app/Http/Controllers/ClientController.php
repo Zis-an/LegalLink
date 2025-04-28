@@ -21,7 +21,12 @@ class ClientController extends Controller
 
     public function index(Request $request): View
     {
-        $clients = Client::with('user')->orderByDesc('id')->paginate(5);
+        if( in_array('client', auth()->user()->roles->pluck('name')->toArray() ) ) {
+            $clients = Client::with('user')->where('user_id', auth()->id())->get();
+        } else {
+            $clients = Client::with('user')->orderByDesc('id')->paginate(5);
+        }
+
         return view('clients.index', compact('clients'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
     }

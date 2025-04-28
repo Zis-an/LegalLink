@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\Lawyer;
 use Illuminate\Http\Request;
 use App\Models\Lawsuit;
 use Illuminate\Support\Facades\Storage;
@@ -33,7 +34,12 @@ class CaseController extends Controller
                 ->paginate(10);
         } else {
             // Admins or other roles see all cases
-            $cases = Lawsuit::with('client.user')->latest()->paginate(10);
+            if($user->hasRole('lawyer')) {
+                $lawyer = Lawyer::where('user_id', $user->id)->first();
+                $cases = Lawsuit::with('client.user')->where('category', $lawyer->practice_area)->latest()->paginate(10);
+            } else {
+                $cases = Lawsuit::with('client.user')->latest()->paginate(10);
+            }
         }
 
         return view('cases.index', compact('cases'))->with('i', ($request->input('page', 1) - 1) * 5);
@@ -50,7 +56,7 @@ class CaseController extends Controller
             $clients = Client::with('user')->get();
         } elseif ($user->hasRole('lawyer')) {
             // Show limited client list or none — let lawyer search in the form
-            $clients = collect(); // or pre-fill only frequent clients if needed
+            $clients = collect();
         } else {
             $clients = collect();
         }

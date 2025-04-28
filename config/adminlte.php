@@ -315,31 +315,31 @@ return [
             'text' => 'Cases',
             'url' => 'cases',
             'icon' => 'fas fa-fw fa-briefcase mr-2',
-            'can' => ['cases.list','cases.create','cases.update','cases.delete'],
+            'can' => ['cases.list','cases.create','cases.show','cases.update','cases.delete'],
         ],
         [
             'text' => 'Lawyers',
             'url' => 'lawyers',
             'icon' => 'fas fa-fw fa-gavel mr-2',
-            'can' => ['lawyers.list','lawyers.create','lawyers.update','lawyers.delete'],
+            'can' => ['lawyers.list','lawyers.create','lawyers.show','lawyers.update','lawyers.delete'],
         ],
         [
             'text' => 'Clients',
             'url' => 'clients',
             'icon' => 'fas fa-fw fa-users mr-2',
-            'can' => ['clients.list','clients.create','clients.update','clients.delete'],
+            'can' => ['clients.list','clients.create','clients.show','clients.update','clients.delete'],
         ],
         [
             'text' => 'Bids',
             'url' => 'bids',
             'icon' => 'fas fa-fw fa-handshake mr-2',
-            'can' => ['bids.list','bids.create','bids.update','bids.delete'],
+            'can' => ['bids.list','bids.create','bids.show','bids.update','bids.delete'],
         ],
         [
             'text' => 'Consultations',
             'url' => 'consultations',
             'icon' => 'fas fa-fw fa-comments mr-2',
-            'can' => ['consultations.list','consultations.create','consultations.update','consultations.delete'],
+            'can' => ['consultations.list','consultations.create','consultations.show','consultations.update','consultations.delete'],
         ],
         [
             'text' => 'Roles',
@@ -357,7 +357,7 @@ return [
             'text' => 'Users',
             'url' => 'users',
             'icon' => 'fas fa-fw fa-users-cog mr-2',
-            'can' => ['users.list','users.create','users.update','users.delete'],
+            'can' => ['users.list','users.create','users.show','users.update','users.delete'],
         ],
 
 //        [

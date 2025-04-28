@@ -26,21 +26,25 @@ class BidController extends Controller
         return view('bids.index', compact('bids'))->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
-    public function create(): View
+    public function create($caseId): View
     {
-        if (Auth::user()->hasRole('admin')) {
-            $lawyers = Lawyer::with('user')->get(); // Show all lawyers to admin
-        } elseif (Auth::user()->hasRole('lawyer')) {
-            $lawyers = Lawyer::with('user')
-                ->where('user_id', Auth::id()) // Only self for lawyer
-                ->get();
-        } else {
-            $lawyers = collect(); // Empty collection if not admin/lawyer
+        $case = Lawsuit::findOrFail($caseId);
+
+        if (!Auth::user()->hasRole(['lawyer', 'admin'])) {
+            abort(403, 'Only lawyers and admins can bid.');
         }
 
-        $cases = Lawsuit::all();
-        return view('bids.create', compact('cases', 'lawyers'));
+        $lawyers = Lawyer::where('user_id', Auth::id())->first();
+
+        if (!$lawyers) {
+            $lawyers = Lawyer::all(); // Admin case: list all lawyers
+        } else {
+            $lawyers = collect([$lawyers]); // Lawyer case: single lawyer inside a collection
+        }
+
+        return view('bids.create', compact('case', 'lawyers'));
     }
+
 
     public function store(Request $request): RedirectResponse
     {

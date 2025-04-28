@@ -27,7 +27,8 @@ class CreateAdminUserSeeder extends Seeder
         $superAdmin = User::create([
             'name' => 'Super Admin',
             'email' => 'superadmin@gmail.com',
-            'password' => bcrypt('123456')
+            'password' => bcrypt('123456'),
+            'role_id' => $adminRole->id, // Assign the role_id
         ]);
         $superAdmin->assignRole('admin');
 
@@ -35,7 +36,8 @@ class CreateAdminUserSeeder extends Seeder
         $moderator = User::create([
             'name' => 'Moderator',
             'email' => 'moderator@gmail.com',
-            'password' => bcrypt('123456')
+            'password' => bcrypt('123456'),
+            'role_id' => $adminRole->id, // Assign the role_id
         ]);
         $moderator->assignRole('admin');
 
@@ -44,7 +46,8 @@ class CreateAdminUserSeeder extends Seeder
             $user = User::create([
                 'name' => "Client $i",
                 'email' => "client$i@gmail.com",
-                'password' => bcrypt('123456')
+                'password' => bcrypt('123456'),
+                'role_id' => $clientRole->id, // Assign the role_id
             ]);
             $user->assignRole('client');
 
@@ -62,7 +65,8 @@ class CreateAdminUserSeeder extends Seeder
             $user = User::create([
                 'name' => "Lawyer $i",
                 'email' => "lawyer$i@gmail.com",
-                'password' => bcrypt('123456')
+                'password' => bcrypt('123456'),
+                'role_id' => $lawyerRole->id, // Assign the role_id
             ]);
             $user->assignRole('lawyer');
 

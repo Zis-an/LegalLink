@@ -37,6 +37,7 @@
                                 <th>Subcategory</th>
                                 <th>Status</th>
                                 <th>Voice Note</th>
+                                @if(auth()->user()->hasRole(['lawyer', 'admin'])) <th>Bid</th> @endif
                                 <th>Actions</th>
                             </tr>
                             </thead>
@@ -45,7 +46,7 @@
                                 <tr>
                                     <td>{{ $case->title }}</td>
                                     <td>{{ $case->client->user->name }}</td>
-                                    <td>{{ $case->category }}</td>
+                                    <td>{{ ucfirst($case->category) }}</td>
                                     <td>{{ $case->subcategory }}</td>
                                     <td>
                                         @php
@@ -68,13 +69,29 @@
                                             <span class="text-muted">N/A</span>
                                         @endif
                                     </td>
+                                    @if(auth()->user()->hasRole(['lawyer', 'admin']))
+                                        <td>
+                                            <a href="{{ route('bids.create', $case->id) }}" class="btn btn-success btn-sm">Bid</a>
+                                        </td>
+                                    @endif
                                     <td>
-                                        <a href="{{ route('cases.show', $case->id) }}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></a>
-                                        <a href="{{ route('cases.edit', $case->id) }}" class="btn btn-warning btn-sm"><i class="fa fa-pen"></i></a>
+                                        @can('cases.show')
+                                            <a href="{{ route('cases.show', $case->id) }}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></a>
+                                        @endcan
+
+                                        @can('cases.update')
+                                            <a href="{{ route('cases.edit', $case->id) }}" class="btn btn-warning btn-sm"><i class="fa fa-pen"></i></a>
+                                        @endcan
+
                                         <form action="{{ route('cases.destroy', $case->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure to delete this case?')"><i class="fa fa-trash"></i></button>
+                                        @csrf
+                                        @method('DELETE')
+
+                                        @can('cases.delete')
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="isDelete(this)">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        @endcan
                                         </form>
                                     </td>
                                 </tr>

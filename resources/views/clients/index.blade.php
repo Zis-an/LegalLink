@@ -22,11 +22,9 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-
             @if ($message = Session::get('success'))
                 <div class="alert alert-success">{{ $message }}</div>
             @endif
-
             @can('clients.list')
                 <div class="card">
                     <div class="card-body table-responsive">

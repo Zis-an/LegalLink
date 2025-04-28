@@ -20,47 +20,50 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    @if (count($errors) > 0)
-                        <div class = "alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+            @can('permissions.show')
+                <div class="card">
+                    <div class="card-body">
+                        @if (count($errors) > 0)
+                            <div class = "alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
 
-                    <form action="{{ route('permissions.destroy', $permission->id) }}" method="POST">
-                    @method('DELETE')
-                    @csrf
-                    @can('permissions.view')
-                        <a href="{{ route('permissions.index') }}" class="btn btn-info px-1 py-0 btn-sm">Go Back</a>
-                    @endcan
-                        <div class="d-flex justify-content-end">
-                        @can('permissions.update')
-                            <a href="{{ route('permissions.edit',['permission'=>$permission->id]) }}">
-                                <div  class="btn btn-warning px-3 border py-1">Edit</div>
-                            </a>
-                        @endcan
-                        @can('permissions.delete')
-                            <button onclick="isDelete(this)" class="btn btn-danger px-3 py-1 ml-2">Delete</button>
-                        @endcan
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input name="name" type="text" value="{{ $permission->name }}" disabled required
+                                   class="form-control" id="name" placeholder="Enter name">
                         </div>
-                    </form>
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input name="name" type="text" value="{{ $permission->name }}" disabled required
-                               class="form-control" id="name" placeholder="Enter name">
-                    </div>
-                    <div class="form-group">
-                        <label for="guard">Guard</label>
-                        <input type="text" name="guard_name" disabled required value="{{ $permission->guard_name }}"
-                               class="form-control" id="guard" placeholder="Enter guard name">
+                        <div class="form-group">
+                            <label for="guard">Guard</label>
+                            <input type="text" name="guard_name" disabled required value="{{ $permission->guard_name }}"
+                                   class="form-control" id="guard" placeholder="Enter guard name">
+                        </div>
+
+                        <form action="{{ route('permissions.destroy', $permission->id) }}" method="POST">
+                            @method('DELETE')
+                            @csrf
+                            @can('permissions.list')
+                                <a href="{{ route('permissions.index') }}" class="btn btn-info px-1 py-0 btn-sm">Go Back</a>
+                            @endcan
+                            <div class="d-flex justify-content-end">
+                            @can('permissions.update')
+                                <a href="{{ route('permissions.edit',['permission'=>$permission->id]) }}">
+                                    <div  class="btn btn-warning px-3 border py-1">Edit</div>
+                                </a>
+                            @endcan
+                            @can('permissions.delete')
+                                <button onclick="isDelete(this)" class="btn btn-danger px-3 py-1 ml-2">Delete</button>
+                            @endcan
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </div>
+            @endcan
         </div>
     </div>
 @stop

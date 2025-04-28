@@ -20,7 +20,8 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            @can('bids.create')
+                <div class="card">
                 <div class="card-body">
                     <form action="{{ route('bids.store') }}" method="POST">
                         @csrf
@@ -34,20 +35,11 @@
                                 </ul>
                             </div>
                         @endif
-
                         <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="case_id">Case</label>
                                 <select name="case_id" class="form-control select2" required>
-                                    @if($cases->isNotEmpty())
-                                    @foreach ($cases as $case)
-                                        <option value="{{ $case->id }}" {{ old('case_id') == $case->id ? 'selected' : '' }}>
-                                            {{ $case->title }}
-                                        </option>
-                                    @endforeach
-                                    @else
-                                        <option value="">No cases available</option>
-                                    @endif
+                                    <option value="{{ $case->id }}" {{ old('case_id') == $case->id ? 'selected' : '' }}>{{ $case->title }}</option>
                                 </select>
                             </div>
 
@@ -89,9 +81,12 @@
                         @can('bids.create')
                             <button type="submit" class="btn btn-primary">Create</button>
                         @endcan
+
+                        <a href="{{ route('bids.index') }}" class="btn btn-secondary">Cancel</a>
                     </form>
                 </div>
             </div>
+            @endcan
         </div>
     </div>
 @stop

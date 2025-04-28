@@ -46,23 +46,23 @@
                                     </td>
                                     <td class="text-center">
                                         <form action="{{ route('roles.destroy', $role->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            @can('roles.show')
-                                                <a href="{{ route('roles.show', $role->id) }}" class="btn btn-info btn-sm px-1 py-0">
-                                                    <i class="fa fa-eye"></i>
-                                                </a>
-                                            @endcan
-                                            @can('roles.update')
-                                                <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-warning btn-sm px-1 py-0">
-                                                    <i class="fa fa-pen"></i>
-                                                </a>
-                                            @endcan
-                                            @can('roles.delete')
-                                                <button onclick="isDelete(this)" class="delete-button btn btn-danger btn-sm px-1 py-0">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            @endcan
+                                        @csrf
+                                        @method('DELETE')
+                                        @can('roles.show')
+                                            <a href="{{ route('roles.show', $role->id) }}" class="btn btn-info btn-sm px-1 py-0">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                        @endcan
+                                        @can('roles.update')
+                                            <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-warning btn-sm px-1 py-0">
+                                                <i class="fa fa-pen"></i>
+                                            </a>
+                                        @endcan
+                                        @can('roles.delete')
+                                            <button onclick="isDelete(this)" class="delete-button btn btn-danger btn-sm px-1 py-0">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        @endcan
                                         </form>
                                     </td>
                                 </tr>

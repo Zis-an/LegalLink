@@ -48,7 +48,7 @@
                                     <td><img src="{{ asset('storage/' . $lawyer->photo) }}" width="50"></td>
                                     <td class="text-capitalize">{{ $lawyer->user->name }}</td>
                                     <td>{{ $lawyer->bar_id }}</td>
-                                    <td>{{ $lawyer->practice_area }}</td>
+                                    <td>{{ ucfirst($lawyer->practice_area) }}</td>
                                     <td>{{ $lawyer->chamber_name }}</td>
                                     <td>
                                         <form action="{{ route('lawyers.destroy', $lawyer->id) }}" method="POST">
@@ -61,7 +61,7 @@
                                                     <i class="fa fa-eye"></i>
                                                 </a>
                                             @endcan
-                                            @can('cases.update')
+                                            @can('lawyers.update')
                                                 <a href="{{ route('users.edit', $lawyer->user_id) }}"
                                                    class="btn btn-warning px-1 py-0 btn-sm">
                                                     <i class="fa fa-pen"></i>
