@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('category');
             $table->string('subcategory');
             $table->text('description');
+            $table->boolean('is_bid')->default(0);
             $table->string('voice_note')->nullable();
             $table->enum('status', ['open', 'in_progress', 'closed'])->default('open');
             $table->timestamps();

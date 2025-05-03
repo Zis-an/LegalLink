@@ -306,7 +306,7 @@
     </script>
     <script>
         const subcategories = {
-            Civil: [
+            civil: [
                 'Property Disputes',
                 'Contract Disputes',
                 'Personal Injury',
@@ -314,7 +314,7 @@
                 'Family Law',
                 'Administrative Suits'
             ],
-            Criminal: [
+            criminal: [
                 'Crimes Against Humanity',
                 'Crimes Against Property',
                 'Crimes Against Persons',

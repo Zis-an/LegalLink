@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreign('lawyer_id')->references('id')->on('lawyers')->onDelete('cascade');
             $table->decimal('fee');
             $table->date('time_estimated');
-            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

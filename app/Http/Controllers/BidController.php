@@ -53,15 +53,27 @@ class BidController extends Controller
             'lawyer_id' => 'required|exists:lawyers,id',
             'fee' => 'required|numeric',
             'time_estimated' => 'required|date',
-            'status' => 'required|in:pending,accepted,rejected',
         ]);
+
+        $exists = Bid::where('case_id', $request->case_id)
+            ->where('lawyer_id', $request->lawyer_id)
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'You have already bid on this case.');
+        }
+
+        $case = Lawsuit::findOrFail($request->case_id);
+
+        if ($case->accepted_bid_id) {
+            return back()->with('error', 'Bidding is closed for this case.');
+        }
 
         $bid = Bid::create([
             'case_id' => $request->case_id,
             'lawyer_id' => $request->lawyer_id,
             'fee' => $request->fee,
             'time_estimated' => $request->time_estimated,
-            'status' => $request->status
         ]);
 
         return redirect()->route('bids.index')->with('success', 'Bid created successfully');
@@ -117,5 +129,29 @@ class BidController extends Controller
     {
         Bid::findOrFail($id)->delete();
         return redirect()->route('bids.index')->with('success', 'Bid deleted successfully');
+    }
+
+    public function accept($id): RedirectResponse
+    {
+        $bid = Bid::with('case')->findOrFail($id);
+        $case = $bid->case;
+
+        if ($case->accepted_bid_id) {
+            return back()->with('error', 'A bid has already been accepted for this case.');
+        }
+
+        $bid->status = 'accepted';
+        $bid->save();
+
+        // Reject other bids for the same case
+        Bid::where('case_id', $case->id)
+            ->where('id', '!=', $bid->id)
+            ->update(['status' => 'rejected']);
+
+        $case->accepted_bid_id = $bid->id;
+        $case->status = 'in_progress';
+        $case->save();
+
+        return back()->with('success', 'Bid accepted successfully.');
     }
 }

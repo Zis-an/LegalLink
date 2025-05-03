@@ -89,9 +89,31 @@
 @stop
 
 @section('plugins.Datatables', true)
+@section('plugins.Sweetalert2', true)
 
 @section('js')
     <script>
+
+        function isDelete(button) {
+            event.preventDefault();
+            var row = $(button).closest("tr");
+            var form = $(button).closest("form");
+            Swal.fire({
+                title: @json(__('Delete Role')),
+                text: @json(__('Are you sure you want to delete this role?')),
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: @json(__('Delete')),
+                cancelButtonText: @json(__('Cancel')),
+            }).then((result) => {
+                console.log(result)
+                if (result.value) {
+                    // Trigger the form submission
+                    form.submit();
+                }
+            });
+        }
+
         $(document).ready(function () {
             $('#usersList').DataTable({
                 responsive: true,
@@ -110,5 +132,6 @@
                 }
             });
         });
+
     </script>
 @stop

@@ -105,14 +105,14 @@ class LawyerController extends Controller
     public function destroy($id): RedirectResponse
     {
         $lawyer = Lawyer::findOrFail($id);
-        $user = User::findOrFail($lawyer->user_id);
 
-        if ($lawyer->photo && Storage::disk('public')->exists($lawyer->photo)) {
+        // Delete photo
+        if ($lawyer->photo) {
             Storage::disk('public')->delete($lawyer->photo);
         }
 
-        $lawyer->delete();
-        $user->delete(); // Optional: if you're deleting the associated user
+        // Delete the associated user
+        $lawyer->user->delete();
 
         return redirect()->route('lawyers.index')->with('success', 'Lawyer deleted successfully');
     }

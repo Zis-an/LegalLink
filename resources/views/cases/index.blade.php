@@ -38,6 +38,7 @@
                                 <th>Status</th>
                                 <th>Voice Note</th>
                                 @if(auth()->user()->hasRole(['lawyer', 'admin'])) <th>Bid</th> @endif
+                                @if(auth()->user()->hasRole(['client', 'admin'])) <th>Bid Status</th> @endif
                                 <th>Actions</th>
                             </tr>
                             </thead>
@@ -71,7 +72,24 @@
                                     </td>
                                     @if(auth()->user()->hasRole(['lawyer', 'admin']))
                                         <td>
-                                            <a href="{{ route('bids.create', $case->id) }}" class="btn btn-success btn-sm">Bid</a>
+                                            @php
+                                                $hasBid = $case->bids->where('lawyer_id', optional(auth()->user()->lawyer)->id)->isNotEmpty();
+                                            @endphp
+
+                                            @if(!$hasBid)
+                                                <a href="{{ route('bids.create', $case->id) }}" class="btn btn-success btn-sm">Bid</a>
+                                            @else
+                                                <button class="btn btn-success btn-sm pe-none" disabled>Already Bid</button>
+                                            @endif
+                                        </td>
+                                    @endif
+                                    @if(auth()->user()->hasRole(['client', 'admin']))
+                                        <td>
+                                            @if($case->bids->count() === 0)
+                                                <span class="badge badge-pill badge-danger">No Bids</span>
+                                            @else
+                                                <span class="badge badge-pill badge-success">{{ $case->bids->count() }} Bids</span>
+                                            @endif
                                         </td>
                                     @endif
                                     <td>

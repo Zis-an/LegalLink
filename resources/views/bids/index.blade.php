@@ -6,9 +6,6 @@
     <div class="row mb-2">
         <div class="col-sm-6">
             <h1>Bids</h1>
-            @can('bids.create')
-                <a href="{{ route('bids.create') }}" class="btn btn-primary mt-2">Add new</a>
-            @endcan
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -25,14 +22,13 @@
             @can('bids.list')
                 <div class="card">
                     <div class="card-body table-responsive">
-                        <table id="bidsList" class="table  dataTable table-bordered table-striped">
+                        <table id="bidsList" class="table dataTable table-bordered table-striped">
                             <thead>
                             <tr>
                                 <th>Case</th>
                                 <th>Lawyer</th>
                                 <th>Fees</th>
                                 <th>Estimated Time</th>
-                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -43,7 +39,6 @@
                                     <td class="text-capitalize">{{ $bid->lawyer->user->name }}</td>
                                     <td class="text-capitalize">{{ $bid->fee }}</td>
                                     <td class="text-capitalize">{{ \Carbon\Carbon::parse($bid->time_estimated)->format('j F, Y') }}</td>
-                                    <td class="text-capitalize">{{ $bid->status }}</td>
                                     <td>
                                         <form action="{{ route('bids.destroy', $bid->id) }}" method="POST">
                                             @method('DELETE')

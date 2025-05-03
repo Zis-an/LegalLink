@@ -23,4 +23,14 @@ class Lawsuit extends Model
     {
         return $this->belongsTo(Client::class);
     }
+
+    public function bids()
+    {
+        return $this->hasMany(Bid::class, 'case_id');
+    }
+
+    public function acceptedBid()
+    {
+        return $this->belongsTo(Bid::class, 'accepted_bid_id');
+    }
 }

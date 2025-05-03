@@ -57,7 +57,7 @@
 
                         <div class="form-group">
                             <label for="description">Case Description</label>
-                            <textarea name="description" rows="4" class="form-control" required>{{ old('description', $case->description) }}</textarea>
+                            <textarea name="description" rows="4" class="form-control" disabled>{{ old('description', $case->description) }}</textarea>
                         </div>
 
                         <div class="form-group">
@@ -71,7 +71,32 @@
                             @endif
                         </div>
 
-                        <div class="form-group">
+                        @if(auth()->user()->hasRole(['client', 'admin']))
+                            @if($case->bids->count())
+                                <table id="bidsList" class="table table-bordered my-4">
+                                    <thead>
+                                    <tr>
+                                        <th>Lawyer Name</th>
+                                        <th>Fee</th>
+                                        <th>Time Estimated</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($case->bids as $bid)
+                                        <tr>
+                                            <td>{{ $bid->lawyer->user->name }}</td>
+                                            <td>{{ $bid->fee }}</td>
+                                            <td>{{ $bid->time_estimated }}</td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <p>No bids yet.</p>
+                            @endif
+                        @endif
+
+                        <div class="form-group mt-3">
                         @can('cases.list')
                             <a href="{{ route('cases.index') }}" class="btn btn-primary">Go Back</a>
                         @endcan
@@ -95,6 +120,8 @@
 
 
 @section('plugins.Sweetalert2', true)
+@section('plugins.datatablesPlugins', true)
+@section('plugins.Datatables', true)
 
 @section('js')
     <script>
@@ -117,5 +144,24 @@
                 }
             });
         }
+
+        $(document).ready(function () {
+            $('#bidsList').DataTable({
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                ordering: true,
+                info: true,
+                pageLength: 10,
+                language: {
+                    paginate: {
+                        first: "First",
+                        previous: "Previous",
+                        next: "Next",
+                        last: "Last"
+                    }
+                }
+            });
+        });
     </script>
 @stop

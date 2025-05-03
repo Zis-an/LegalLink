@@ -67,15 +67,6 @@
                                 <label for="time_estimated">Estimated Date</label>
                                 <input type="date" name="time_estimated" class="form-control" required value="{{ old('time_estimated') }}">
                             </div>
-
-                            <div class="form-group col-md-6">
-                                <label for="status">Case Status</label>
-                                <select name="status" class="form-control" required>
-                                    <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="accepted" {{ old('status') == 'accepted' ? 'selected' : '' }}>Accepted</option>
-                                    <option value="rejected" {{ old('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
-                                </select>
-                            </div>
                         </div>
 
                         @can('bids.create')

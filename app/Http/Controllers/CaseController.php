@@ -25,25 +25,31 @@ class CaseController extends Controller
         $user = auth()->user();
 
         if ($user->hasRole('client')) {
-            // Get only cases for this client
             $client = Client::where('user_id', $user->id)->first();
 
-            $cases = Lawsuit::with('client.user')
+            $cases = Lawsuit::with(['client.user', 'bids'])
+                ->withCount('bids')
                 ->where('client_id', $client->id)
                 ->latest()
                 ->paginate(10);
+        } elseif ($user->hasRole('lawyer')) {
+            $lawyer = Lawyer::where('user_id', $user->id)->first();
+
+            $cases = Lawsuit::with(['client.user', 'bids'])
+                ->withCount('bids')
+                ->where('category', $lawyer->practice_area)
+                ->latest()
+                ->paginate(10);
         } else {
-            // Admins or other roles see all cases
-            if($user->hasRole('lawyer')) {
-                $lawyer = Lawyer::where('user_id', $user->id)->first();
-                $cases = Lawsuit::with('client.user')->where('category', $lawyer->practice_area)->latest()->paginate(10);
-            } else {
-                $cases = Lawsuit::with('client.user')->latest()->paginate(10);
-            }
+            $cases = Lawsuit::with(['client.user', 'bids'])
+                ->withCount('bids')
+                ->latest()
+                ->paginate(10);
         }
 
         return view('cases.index', compact('cases'))->with('i', ($request->input('page', 1) - 1) * 5);
     }
+
 
     public function create(): View
     {
@@ -72,7 +78,7 @@ class CaseController extends Controller
             'voice_note' => 'nullable|file|mimes:mp3,wav',
             'voice_note_blob' => 'nullable|string',
             'status' => 'required|in:open,in_progress,closed',
-            'category' => 'required|in:Civil,Criminal',
+            'category' => 'required|in:civil,criminal',
             'subcategory' => 'required|string|max:255',
         ]);
 
@@ -110,7 +116,7 @@ class CaseController extends Controller
 
     public function show(Lawsuit $case)
     {
-        $case->load('client.user');
+        $case->load(['client.user', 'bids.lawyer.user']);
         return view('cases.show', compact('case'));
     }
 
