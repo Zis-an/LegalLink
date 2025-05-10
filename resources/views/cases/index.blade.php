@@ -1,11 +1,11 @@
 @extends('adminlte::page')
 
-@section('title', 'Cases')
+@section('title', 'Issues')
 
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>Cases</h1>
+            <h1>Issues</h1>
             @can('cases.create')
                 <a href="{{ route('cases.create') }}" class="btn btn-primary mt-2">Add new</a>
             @endcan
@@ -13,7 +13,7 @@
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item active">Cases</li>
+                <li class="breadcrumb-item active">Issues</li>
             </ol>
         </div>
     </div>
@@ -28,27 +28,23 @@
                         @if ($message = Session::get('success'))
                             <div class="alert alert-success">{{ $message }}</div>
                         @endif
-                        <table id="casesList" class="table  dataTable table-bordered table-striped">
+                        <table id="casesList" class="table dataTable table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Title</th>
                                 <th>Client</th>
                                 <th>Category</th>
-                                <th>Subcategory</th>
                                 <th>Status</th>
                                 <th>Voice Note</th>
-                                @if(auth()->user()->hasRole(['lawyer', 'admin'])) <th>Bid</th> @endif
-                                @if(auth()->user()->hasRole(['client', 'admin'])) <th>Bid Status</th> @endif
+                                @if(auth()->user()->hasRole(['lawyer', 'admin'])) <th>Interest</th> @endif
+                                @if(auth()->user()->hasRole(['client', 'admin'])) <th>Interested Lawyers</th> @endif
                                 <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach ($cases as $case)
                                 <tr>
-                                    <td>{{ $case->title }}</td>
                                     <td>{{ $case->client->user->name }}</td>
                                     <td>{{ ucfirst($case->category) }}</td>
-                                    <td>{{ $case->subcategory }}</td>
                                     <td>
                                         @php
                                             $badge = match($case->status) {
@@ -77,18 +73,18 @@
                                             @endphp
 
                                             @if(!$hasBid)
-                                                <a href="{{ route('bids.create', $case->id) }}" class="btn btn-success btn-sm">Bid</a>
+                                                <a href="{{ route('bids.create', $case->id) }}" class="btn btn-success btn-sm">Interested</a>
                                             @else
-                                                <button class="btn btn-success btn-sm pe-none" disabled>Already Bid</button>
+                                                <button class="btn btn-success btn-sm pe-none" disabled>Interested</button>
                                             @endif
                                         </td>
                                     @endif
                                     @if(auth()->user()->hasRole(['client', 'admin']))
                                         <td>
                                             @if($case->bids->count() === 0)
-                                                <span class="badge badge-pill badge-danger">No Bids</span>
+                                                <span class="badge badge-pill badge-danger">None</span>
                                             @else
-                                                <span class="badge badge-pill badge-success">{{ $case->bids->count() }} Bids</span>
+                                                <span class="badge badge-pill badge-success">{{ $case->bids->count() }} {{ $case->bids->count() == 1 ? "Lawyer" : "Lawyers" }}</span>
                                             @endif
                                         </td>
                                     @endif
@@ -140,7 +136,7 @@
             var row = $(button).closest("tr");
             var form = $(button).closest("form");
             Swal.fire({
-                title: @json(__('Delete Case')),
+                title: @json(__('Delete Issue')),
                 text: @json(__('Are you sure you want to delete this?')),
                 icon: "warning",
                 showCancelButton: true,

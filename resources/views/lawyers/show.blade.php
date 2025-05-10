@@ -51,6 +51,10 @@
                                 <input type="text" class="form-control" value="{{ $lawyer->practice_area }}" disabled>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label>Practice Court Name</label>
+                                <input type="text" class="form-control" value="{{ $lawyer->practice_court }}" disabled>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label>Chamber Name</label>
                                 <input type="text" class="form-control" value="{{ $lawyer->chamber_name }}" disabled>
                             </div>

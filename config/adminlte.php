@@ -312,7 +312,7 @@ return [
 
         // Sidebar items:
         [
-            'text' => 'Cases',
+            'text' => 'Issues',
             'url' => 'cases',
             'icon' => 'fas fa-fw fa-briefcase mr-2',
             'can' => ['cases.list','cases.create','cases.show','cases.update','cases.delete'],

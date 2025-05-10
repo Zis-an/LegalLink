@@ -73,13 +73,17 @@ class CaseController extends Controller
     {
         $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'title' => 'required|string|max:255',
+            'title' => 'nullable',
             'description' => 'required|string',
             'voice_note' => 'nullable|file|mimes:mp3,wav',
             'voice_note_blob' => 'nullable|string',
             'status' => 'required|in:open,in_progress,closed',
             'category' => 'required|in:civil,criminal',
-            'subcategory' => 'required|string|max:255',
+            // 'subcategory' => 'required|string|max:255',
+            'country' => 'nullable|string|max:255',
+            'division' => 'nullable|string|max:255',
+            'district' => 'nullable|string|max:255',
+            'thana' => 'nullable|string|max:255',
         ]);
 
         $path = null;
@@ -108,10 +112,14 @@ class CaseController extends Controller
             'voice_note' => $path,
             'status' => $request->status,
             'category' => $request->category,
-            'subcategory' => $request->subcategory,
+            // 'subcategory' => $request->subcategory,
+            'country' => $request->country,
+            'division' => $request->division,
+            'district' => $request->district,
+            'thana' => $request->thana,
         ]);
 
-        return redirect()->route('cases.index')->with('success', 'Case created successfully');
+        return redirect()->route('cases.index')->with('success', 'Issue created successfully');
     }
 
     public function show(Lawsuit $case)
@@ -136,6 +144,10 @@ class CaseController extends Controller
             'status' => 'required|in:open,in_progress,closed',
             'category' => 'required|in:Civil,Criminal',
             'subcategory' => 'required|string|max:255',
+            'country' => 'nullable|string|max:255',
+            'division' => 'nullable|string|max:255',
+            'district' => 'nullable|string|max:255',
+            'thana' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('voice_note')) {
@@ -153,6 +165,10 @@ class CaseController extends Controller
             'status' => $request->status,
             'category' => $request->category,
             'subcategory' => $request->subcategory,
+            'country' => $request->country,
+            'division' => $request->division,
+            'district' => $request->district,
+            'thana' => $request->thana,
         ]);
 
         return redirect()->route('cases.index')->with('success', 'Case updated successfully.');

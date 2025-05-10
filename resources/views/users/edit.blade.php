@@ -79,7 +79,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group d-none">
                                 <label for="roles">Assign Role</label>
                                 <select name="roles" class="form-control select2" required>
                                     @foreach($roles as $role)
@@ -98,7 +98,7 @@
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label>Photo</label>
-                                        <input type="file" name="client_photo" class="form-control">
+                                        <input type="file" name="client_photo" class="form-control-file border border-1 p-1">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label>Address</label>
@@ -111,11 +111,11 @@
                             <div id="lawyer-fields" style="display: none;">
                                 <h5 class="mt-4 mb-3">Lawyer Information</h5>
                                 <div class="row">
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-2">
                                         <label>Bar Council ID</label>
                                         <input type="text" name="lawyer_bar_id" class="form-control" value="{{ old('lawyer_bar_id', $lawyer?->bar_id) }}">
                                     </div>
-                                    <div class="form-group col-md-4 mb-3">
+                                    <div class="form-group col-md-2 mb-3">
                                         <label for="lawyer_practice_area" class="form-label">Practice Area</label>
                                         <select name="lawyer_practice_area" id="lawyer_practice_area" class="form-control select2" style="width: 100%;">
                                             <option value="civil" {{ (isset($lawyer) && $lawyer->practice_area == 'civil') ? 'selected' : '' }}>Civil</option>
@@ -123,8 +123,13 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-md-4">
+                                        <label for="practice_court">Practice Court Name</label>
+                                        <input type="text" name="practice_court" id="practice_court" class="form-control"
+                                               value="{{ old('practice_court', $lawyer->practice_court) }}">
+                                    </div>
+                                    <div class="form-group col-md-4">
                                         <label>Photo</label>
-                                        <input type="file" name="lawyer_photo" class="form-control">
+                                        <input type="file" name="lawyer_photo" class="form-control-file border border-1 p-1">
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label>Chamber Name</label>

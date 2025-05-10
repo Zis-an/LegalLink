@@ -1,17 +1,17 @@
 @extends('adminlte::page')
 
-@section('title', 'View Case')
+@section('title', 'View Issue')
 
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>View Case - {{ $case->title }}</h1>
+            <h1>View Issue @if(!empty($case->title)) - {{ $case->title }} @endif</h1>
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('cases.index') }}">Cases</a></li>
-                <li class="breadcrumb-item active">View Case</li>
+                <li class="breadcrumb-item"><a href="{{ route('cases.index') }}">Issues</a></li>
+                <li class="breadcrumb-item active">View Issue</li>
             </ol>
         </div>
     </div>
@@ -24,17 +24,20 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-4 d-none">
                                 <label for="client_id">Client</label>
                                 <select name="client_id" class="form-control select2" disabled>
                                     <option>{{ $case->client->user->name }}</option>
                                 </select>
                             </div>
 
-                            <div class="form-group col-md-4">
-                                <label for="title">Case Title</label>
-                                <input type="text" name="title" class="form-control" value="{{ old('title', $case->title) }}" disabled>
-                            </div>
+                            @if(!empty(old('title', $case->title)))
+                                <div class="form-group col-md-4">
+                                    <label for="title">Issue's Title</label>
+                                    <input type="text" name="title" class="form-control"
+                                           value="{{ old('title', $case->title) }}" disabled>
+                                </div>
+                            @endif
 
                             <div class="form-group col-md-4">
                                 <label for="status">Case Status</label>
@@ -50,13 +53,15 @@
                             <div class="form-group col-6">
                                 <strong>Category:</strong> {{ $case->category }}
                             </div>
-                            <div class="form-group col-6">
-                                <strong>Subcategory:</strong> {{ $case->subcategory }}
-                            </div>
+                            @if(!empty($case->subcategory))
+                                <div class="form-group col-6">
+                                    <strong>Subcategory:</strong> {{ $case->subcategory }}
+                                </div>
+                            @endif
                         </div>
 
                         <div class="form-group">
-                            <label for="description">Case Description</label>
+                            <label for="description">Issue's Description</label>
                             <textarea name="description" rows="4" class="form-control" disabled>{{ old('description', $case->description) }}</textarea>
                         </div>
 
@@ -79,6 +84,7 @@
                                         <th>Lawyer Name</th>
                                         <th>Fee</th>
                                         <th>Time Estimated</th>
+                                        <th>Chat</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -87,6 +93,11 @@
                                             <td>{{ $bid->lawyer->user->name }}</td>
                                             <td>{{ $bid->fee }}</td>
                                             <td>{{ $bid->time_estimated }}</td>
+                                            <td>
+                                                <a href="{{ url('chatify/' . $bid->lawyer->user->id) }}" class="btn btn-sm btn-success">
+                                                    Chat
+                                                </a>
+                                            </td>
                                         </tr>
                                     @endforeach
                                     </tbody>
@@ -94,6 +105,12 @@
                             @else
                                 <p>No bids yet.</p>
                             @endif
+                        @endif
+
+                        @if(auth()->user()->hasRole(['lawyer', 'admin']))
+                            <a href="{{ url('chatify') }}" class="btn btn-success my-3">
+                                Go to Chat Inbox
+                            </a>
                         @endif
 
                         <div class="form-group mt-3">

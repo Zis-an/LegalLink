@@ -1,17 +1,17 @@
 @extends('adminlte::page')
 
-@section('title', 'Edit Case')
+@section('title', 'Edit Issue')
 
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>Edit Case</h1>
+            <h1>Edit Issue</h1>
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('cases.index') }}">Cases</a></li>
-                <li class="breadcrumb-item active">Edit Case</li>
+                <li class="breadcrumb-item"><a href="{{ route('cases.index') }}">Issues</a></li>
+                <li class="breadcrumb-item active">Edit Issue</li>
             </ol>
         </div>
     </div>
@@ -38,7 +38,7 @@
                             @method('PUT')
 
                             <div class="row">
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-4 d-none">
                                     <label for="client_id">Client</label>
                                     <select name="client_id" class="form-control select2" required>
                                         @foreach ($clients as $client)
@@ -49,22 +49,30 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-4 d-none">
                                     <label for="title">Case Title</label>
                                     <input type="text" name="title" class="form-control" value="{{ old('title', $case->title) }}" required>
                                 </div>
 
-                                <div class="form-group col-md-4">
-                                    <label for="status">Case Status</label>
-                                    <select name="status" class="form-control" required>
-                                        <option value="open" {{ $case->status == 'open' ? 'selected' : '' }}>Open</option>
-                                        <option value="in_progress" {{ $case->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                        <option value="closed" {{ $case->status == 'closed' ? 'selected' : '' }}>Closed</option>
-                                    </select>
+                                <div class="form-group col-md-3">
+                                    <label for="country">Country</label>
+                                    <input type="text" name="country" id="country" class="form-control">
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="division">Division</label>
+                                    <input type="text" name="division" id="division" class="form-control">
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="district">District</label>
+                                    <input type="text" name="district" id="district" class="form-control">
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="thana">Police Station</label>
+                                    <input type="text" name="thana" id="thana" class="form-control">
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="category">Case Category</label>
+                                    <label for="category">Issue Category</label>
                                     <select name="category" id="category" class="form-control" required>
                                         <option value="">-- Select Category --</option>
                                         <option value="civil" {{ old('category', $lawsuit->category ?? '') == 'civil' ? 'selected' : '' }}>Civil</option>
@@ -73,6 +81,15 @@
                                 </div>
 
                                 <div class="form-group col-md-6">
+                                    <label for="status">Issue's Status</label>
+                                    <select name="status" class="form-control" required>
+                                        <option value="open" {{ $case->status == 'open' ? 'selected' : '' }}>Open</option>
+                                        <option value="in_progress" {{ $case->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                        <option value="closed" {{ $case->status == 'closed' ? 'selected' : '' }}>Closed</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-6 d-none">
                                     <label for="subcategory">Case Subcategory</label>
                                     <select name="subcategory" id="subcategory" class="form-control" required>
                                         <option value="">-- Select Subcategory --</option>
@@ -81,12 +98,12 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="description">Case Description</label>
+                                <label for="description">Issue's Description</label>
                                 <textarea name="description" rows="4" class="form-control" required>{{ old('description', $case->description) }}</textarea>
                             </div>
 
                             @can('cases.update')
-                                <button type="submit" class="btn btn-success">Update Case</button>
+                                <button type="submit" class="btn btn-success">Update Issue</button>
                             @endcan
 
                             <a href="{{ route('cases.index') }}" class="btn btn-secondary">Cancel</a>

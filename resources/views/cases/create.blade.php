@@ -1,17 +1,17 @@
 @extends('adminlte::page')
 
-@section('title', 'Create Case')
+@section('title', 'Create Issue')
 
 @section('content_header')
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>Create Case</h1>
+            <h1>Create Issue</h1>
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('cases.index') }}">Cases</a></li>
-                <li class="breadcrumb-item active">Create Case</li>
+                <li class="breadcrumb-item"><a href="{{ route('cases.index') }}">Issues</a></li>
+                <li class="breadcrumb-item active">Create Issue</li>
             </ol>
         </div>
     </div>
@@ -38,11 +38,27 @@
                         @csrf
 
                             <div class="row">
-                                <div class="form-group col-md-4">
-                                    <label for="client_id">Client</label>
+                                <div class="form-group col-md-3">
+                                    <label for="country">Country</label>
+                                    <input type="text" name="country" id="country" class="form-control">
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="division">Division</label>
+                                    <input type="text" name="division" id="division" class="form-control">
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="district">District</label>
+                                    <input type="text" name="district" id="district" class="form-control">
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="thana">Police Station</label>
+                                    <input type="text" name="thana" id="thana" class="form-control">
+                                </div>
 
+                                <div class="form-group col-md-4 d-none">
+                                    <label for="client_id">Client</label>
                                     @if ($clients->isNotEmpty())
-                                        <select name="client_id" class="form-control select2" required>
+                                        <select name="client_id" class="form-control select2">
                                             @foreach ($clients as $client)
                                                 <option value="{{ $client->id }}" {{ old('client_id') == $client->id ? 'selected' : '' }}>
                                                     {{ $client->user->name }}
@@ -50,27 +66,27 @@
                                             @endforeach
                                         </select>
                                     @else
-                                        <select name="client_id" id="clientSelect" class="form-control select2" required></select>
+                                        <select name="client_id" id="clientSelect" class="form-control select2"></select>
                                     @endif
                                 </div>
 
-                                <div class="form-group col-md-4">
-                                    <label for="title">Case Title</label>
-                                    <input type="text" name="title" class="form-control" required value="{{ old('title') }}" placeholder="Enter case title">
-                                </div>
+{{--                                <div class="form-group col-md-4">--}}
+{{--                                    <label for="title">Issue Title</label>--}}
+{{--                                    <input type="text" name="title" class="form-control" required value="{{ old('title') }}" placeholder="Enter case title">--}}
+{{--                                </div>--}}
 
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-4 d-none">
                                     <label for="status">Case Status</label>
-                                    <select name="status" class="form-control" required>
-                                        <option value="open" {{ old('status') == 'open' ? 'selected' : '' }}>Open</option>
-                                        <option value="in_progress" {{ old('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                        <option value="closed" {{ old('status') == 'closed' ? 'selected' : '' }}>Closed</option>
+                                    <select name="status" class="form-control">
+                                        <option value="open" selected>Open</option>
+{{--                                        <option value="in_progress" {{ old('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>--}}
+{{--                                        <option value="closed" {{ old('status') == 'closed' ? 'selected' : '' }}>Closed</option>--}}
                                     </select>
                                 </div>
 
                                 {{-- Category --}}
-                                <div class="form-group col-md-6">
-                                    <label for="category">Case Category</label>
+                                <div class="form-group col-12">
+                                    <label for="category">Issue Category</label>
                                     <select name="category" id="category" class="form-control" required>
                                         <option value="">-- Select Category --</option>
                                         <option value="civil" {{ old('category') == 'civil' ? 'selected' : '' }}>Civil</option>
@@ -79,17 +95,16 @@
                                 </div>
 
                                 {{-- Subcategory --}}
-                                <div class="form-group col-md-6">
-                                    <label for="subcategory">Case Subcategory</label>
-                                    <select name="subcategory" id="subcategory" class="form-control" required>
-                                        <option value="">-- Select Subcategory --</option>
-                                        {{-- Options populated by JS --}}
-                                    </select>
-                                </div>
+{{--                                <div class="form-group col-md-6">--}}
+{{--                                    <label for="subcategory">Case Subcategory</label>--}}
+{{--                                    <select name="subcategory" id="subcategory" class="form-control" required>--}}
+{{--                                        <option value="">-- Select Subcategory --</option>--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
                             </div>
 
                             <div class="form-group">
-                                <label for="description">Case Description</label>
+                                <label for="description">Issue's Description</label>
                                 <textarea name="description" rows="4" class="form-control" required placeholder="Enter detailed case description">{{ old('description') }}</textarea>
                             </div>
 
@@ -109,7 +124,7 @@
                             </div>
 
                             @can('cases.create')
-                                <button type="submit" class="btn btn-success">Create Case</button>
+                                <button type="submit" class="btn btn-success">Create Issue</button>
                             @endcan
 
                             <a href="{{ route('cases.index') }}" class="btn btn-secondary">Cancel</a>
@@ -323,20 +338,20 @@
             ]
         };
 
-        function populateSubcategories(category, selected = null) {
-            const subcategorySelect = document.getElementById('subcategory');
-            subcategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
-
-            if (subcategories[category]) {
-                subcategories[category].forEach(sub => {
-                    const opt = document.createElement('option');
-                    opt.value = sub;
-                    opt.text = sub;
-                    if (sub === selected) opt.selected = true;
-                    subcategorySelect.appendChild(opt);
-                });
-            }
-        }
+        // function populateSubcategories(category, selected = null) {
+        //     const subcategorySelect = document.getElementById('subcategory');
+        //     subcategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
+        //
+        //     if (subcategories[category]) {
+        //         subcategories[category].forEach(sub => {
+        //             const opt = document.createElement('option');
+        //             opt.value = sub;
+        //             opt.text = sub;
+        //             if (sub === selected) opt.selected = true;
+        //             subcategorySelect.appendChild(opt);
+        //         });
+        //     }
+        // }
 
         document.getElementById('category').addEventListener('change', function () {
             populateSubcategories(this.value);

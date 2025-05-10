@@ -14,6 +14,7 @@ class Lawyer extends Model
         'bar_id',
         'user_id',
         'practice_area',
+        'practice_court',
         'chamber_name',
         'chamber_address',
         'photo',

@@ -60,13 +60,13 @@ class BidController extends Controller
             ->exists();
 
         if ($exists) {
-            return back()->with('error', 'You have already bid on this case.');
+            return back()->with('error', 'You have already bid on this issue.');
         }
 
         $case = Lawsuit::findOrFail($request->case_id);
 
         if ($case->accepted_bid_id) {
-            return back()->with('error', 'Bidding is closed for this case.');
+            return back()->with('error', 'Bidding is closed for this issue.');
         }
 
         $bid = Bid::create([
@@ -137,7 +137,7 @@ class BidController extends Controller
         $case = $bid->case;
 
         if ($case->accepted_bid_id) {
-            return back()->with('error', 'A bid has already been accepted for this case.');
+            return back()->with('error', 'A bid has already been accepted for this issue.');
         }
 
         $bid->status = 'accepted';

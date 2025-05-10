@@ -37,6 +37,7 @@
                                 <th>User Name</th>
                                 <th>Bar ID</th>
                                 <th>Practice Area</th>
+                                <th>Practice Court Name</th>
                                 <th>Chamber Name</th>
                                 <th>Actions</th>
                             </tr>
@@ -49,6 +50,7 @@
                                     <td class="text-capitalize">{{ $lawyer->user->name }}</td>
                                     <td>{{ $lawyer->bar_id }}</td>
                                     <td>{{ ucfirst($lawyer->practice_area) }}</td>
+                                    <td>{{ ucfirst($lawyer->practice_court) }}</td>
                                     <td>{{ $lawyer->chamber_name }}</td>
                                     <td>
                                         <form action="{{ route('lawyers.destroy', $lawyer->id) }}" method="POST">

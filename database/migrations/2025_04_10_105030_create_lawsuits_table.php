@@ -15,13 +15,20 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('client_id');
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->string('category');
-            $table->string('subcategory');
+            $table->string('subcategory')->nullable();
             $table->text('description');
             $table->boolean('is_bid')->default(0);
             $table->string('voice_note')->nullable();
             $table->enum('status', ['open', 'in_progress', 'closed'])->default('open');
+
+            // New fields
+            $table->string('country')->nullable();
+            $table->string('division')->nullable();
+            $table->string('district')->nullable();
+            $table->string('thana')->nullable();
+
             $table->timestamps();
         });
     }

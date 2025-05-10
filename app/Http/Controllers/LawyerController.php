@@ -40,9 +40,10 @@ class LawyerController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'bar_id' => 'required',
+            'bar_id' => 'required|unique:lawyers,bar_id',
             'user_id' => 'required|exists:users,id',
             'practice_area' => 'required',
+            'practice_court' => 'required',
             'chamber_name' => 'required',
             'chamber_address' => 'required',
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
@@ -54,6 +55,7 @@ class LawyerController extends Controller
             'bar_id' => $request->bar_id,
             'user_id' => $request->user_id,
             'practice_area' => $request->practice_area,
+            'practice_court' => $request->practice_court,
             'chamber_name' => $request->chamber_name,
             'chamber_address' => $request->chamber_address,
             'photo' => $path,
@@ -80,15 +82,16 @@ class LawyerController extends Controller
         $lawyer = Lawyer::findOrFail($id);
 
         $request->validate([
-            'bar_id' => 'required',
+            'bar_id' => 'required|unique:lawyers,bar_id,' . $lawyer->id,
             'user_id' => 'required|exists:users,id',
             'practice_area' => 'required',
+            'practice_court' => 'required',
             'chamber_name' => 'required',
             'chamber_address' => 'required',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = $request->only('bar_id', 'user_id', 'practice_area', 'chamber_name', 'chamber_address');
+        $data = $request->only('bar_id', 'user_id', 'practice_area', 'practice_court', 'chamber_name', 'chamber_address');
 
         if ($request->hasFile('photo')) {
             if ($lawyer->photo && Storage::disk('public')->exists($lawyer->photo)) {

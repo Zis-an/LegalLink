@@ -94,7 +94,7 @@
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label>Photo</label>
-                                        <input type="file" name="client_photo" class="form-control">
+                                        <input type="file" name="client_photo" class="form-control-file border border-1 p-1">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label>Address</label>
@@ -107,11 +107,11 @@
                             <div id="lawyer-fields" style="display: none;">
                                 <h5 class="mt-4 mb-3">Lawyer Information</h5>
                                 <div class="row">
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-2">
                                         <label>Bar Council ID</label>
                                         <input type="text" name="lawyer_bar_id" class="form-control">
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-2">
                                         <label for="lawyer_practice_area">Practice Area</label>
                                         <br>
                                         <select name="lawyer_practice_area" class="form-control select2" style="width: 100%;">
@@ -120,8 +120,13 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label>Photo</label>
-                                        <input type="file" name="lawyer_photo" class="form-control">
+                                        <label for="lawyer_practice_area">Practice Court Name</label>
+                                        <br>
+                                        <input type="text" name="lawyer_practice_court" id="lawyer_practice_court" class="form-control">
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="formFile" class="form-label">Photo</label>
+                                        <input name="lawyer_photo" class="form-control-file border border-1 p-1" type="file" id="formFile">
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label>Chamber Name</label>
@@ -255,6 +260,20 @@
 
             // Run on page load to check preselected role
             toggleExtraFields();
+        });
+    </script>
+    <script>
+        $("input[type=file]").change(function () {
+            var fieldVal = $(this).val();
+
+            // Change the node's value by removing the fake path (Chrome)
+            fieldVal = fieldVal.replace("C:\\fakepath\\", "");
+
+            if (fieldVal != undefined || fieldVal != "") {
+                $(this).next(".custom-file-label").attr('data-content', fieldVal);
+                $(this).next(".custom-file-label").text(fieldVal);
+            }
+
         });
     </script>
 @stop
