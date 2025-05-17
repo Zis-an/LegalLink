@@ -14,10 +14,8 @@ return new class extends Migration
         Schema::create('lawyers', function (Blueprint $table) {
             $table->id();
             $table->string('bar_id')->comment('Bar Council ID')->unique();
-
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-
             $table->string('practice_area');
             $table->string('practice_court');
             $table->string('chamber_name');

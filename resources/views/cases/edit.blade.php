@@ -89,11 +89,9 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group col-md-6 d-none">
-                                    <label for="subcategory">Case Subcategory</label>
-                                    <select name="subcategory" id="subcategory" class="form-control" required>
-                                        <option value="">-- Select Subcategory --</option>
-                                    </select>
+                                <div class="form-group">
+                                    <label for="uploaded_file">Upload File (jpg, png, mp3, mp4, max 100MB)</label>
+                                    <input type="file" name="uploaded_file" id="uploaded_file" class="form-control" accept=".jpg,.jpeg,.png,.mp3,.mp4" onchange="validateFileSize(this)">
                                 </div>
                             </div>
 
@@ -117,6 +115,7 @@
 
 @section('css')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <style>
         .select2-container .select2-selection--single {
             box-sizing: border-box;
@@ -150,62 +149,128 @@
             background-repeat: repeat-x;
             filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFEEEEEE', endColorstr='#FFCCCCCC', GradientType=0);
         }
+
+
+        /* Custom style for Toastr notifications */
+        .toast-info .toast-message {
+            display: flex;
+            align-items: center;
+        }
+        .toast-info .toast-message i {
+            margin-right: 10px;
+        }
+        .toast-info .toast-message .notification-content {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
     </style>
 @stop
 
 @section('js')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script>
+        Pusher.logToConsole = true;
+
+        // Initialize Pusher
+        var pusher = new Pusher('f5d4f2a1ed3a59340e6a', {
+            cluster: 'mt1'
+        });
+
+        // Subscribe to the channel
+        var channel = pusher.subscribe('notification');
+
+        // Bind to the event
+        channel.bind('test.notification', function(data) {
+            console.log('Received data:', data); // Log full data object
+
+            if (data.data && data.data.author && data.data.category) {
+                toastr.info(
+                    `<div class="notification-content">
+                <i class="fas fa-user"></i> <span>   ${data.data.author}</span>
+                <i class="fas fa-book" style="margin-left: 20px;"></i> <span>  ${data.data.category}</span>
+            </div>`,
+                    'New Issue Notification',
+                    {
+                        closeButton: true,
+                        progressBar: true,
+                        timeOut: 0,
+                        extendedTimeOut: 0,
+                        positionClass: 'toast-top-right',
+                        enableHtml: true
+                    }
+                );
+            } else {
+                console.error('Invalid data received:', data);
+            }
+        });
+
+        // Debugging line
+        pusher.connection.bind('connected', function() {
+            console.log('Pusher connected');
+        });
+    </script>
     <script>
         $(document).ready(function () {
             $('.select2').select2();
         });
     </script>
     <script>
-        const subcategories = {
-            Civil: [
-                'Property Disputes',
-                'Contract Disputes',
-                'Personal Injury',
-                'Financial Disputes',
-                'Family Law',
-                'Administrative Suits'
-            ],
-            Criminal: [
-                'Crimes Against Humanity',
-                'Crimes Against Property',
-                'Crimes Against Persons',
-                'Crimes Related to Narcotics',
-                'Other Crimes'
-            ]
-        };
-
-        function populateSubcategories(category, selected = null) {
-            const subcategorySelect = document.getElementById('subcategory');
-            subcategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
-
-            if (subcategories[category]) {
-                subcategories[category].forEach(sub => {
-                    const opt = document.createElement('option');
-                    opt.value = sub;
-                    opt.text = sub;
-                    if (sub === selected) opt.selected = true;
-                    subcategorySelect.appendChild(opt);
-                });
+        function validateFileSize(input) {
+            if (input.files[0].size > 100 * 1024 * 1024) {
+                alert("File size must be less than 100MB.");
+                input.value = ""; // clear the input
             }
         }
+    </script>
+    <script>
+        // const subcategories = {
+        //     Civil: [
+        //         'Property Disputes',
+        //         'Contract Disputes',
+        //         'Personal Injury',
+        //         'Financial Disputes',
+        //         'Family Law',
+        //         'Administrative Suits'
+        //     ],
+        //     Criminal: [
+        //         'Crimes Against Humanity',
+        //         'Crimes Against Property',
+        //         'Crimes Against Persons',
+        //         'Crimes Related to Narcotics',
+        //         'Other Crimes'
+        //     ]
+        // };
 
-        document.getElementById('category').addEventListener('change', function () {
-            populateSubcategories(this.value);
-        });
+        // function populateSubcategories(category, selected = null) {
+        //     const subcategorySelect = document.getElementById('subcategory');
+        //     subcategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
+        //
+        //     if (subcategories[category]) {
+        //         subcategories[category].forEach(sub => {
+        //             const opt = document.createElement('option');
+        //             opt.value = sub;
+        //             opt.text = sub;
+        //             if (sub === selected) opt.selected = true;
+        //             subcategorySelect.appendChild(opt);
+        //         });
+        //     }
+        // }
+
+        // document.getElementById('category').addEventListener('change', function () {
+        //     populateSubcategories(this.value);
+        // });
 
         // Auto-populate on edit page
-        document.addEventListener('DOMContentLoaded', function () {
-            const selectedCategory = document.getElementById('category').value;
-            const selectedSub = "{{ old('subcategory', $lawsuit->subcategory ?? '') }}";
-            if (selectedCategory) {
-                populateSubcategories(selectedCategory, selectedSub);
-            }
-        });
+        {{--document.addEventListener('DOMContentLoaded', function () {--}}
+        {{--    const selectedCategory = document.getElementById('category').value;--}}
+        {{--    const selectedSub = "{{ old('subcategory', $lawsuit->subcategory ?? '') }}";--}}
+        {{--    if (selectedCategory) {--}}
+        {{--        populateSubcategories(selectedCategory, selectedSub);--}}
+        {{--    }--}}
+        {{--});--}}
     </script>
 @stop

@@ -14,9 +14,14 @@ class Lawsuit extends Model
         'title',
         'description',
         'voice_note',
+        'uploaded_file',
         'status',
         'category',
-        'subcategory'
+        'subcategory',
+        'country',
+        'division',
+        'district',
+        'thana'
     ];
 
     public function client()

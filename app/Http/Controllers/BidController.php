@@ -22,7 +22,33 @@ class BidController extends Controller
 
     public function index(Request $request): View
     {
-        $bids = Bid::orderBy('id','DESC')->paginate(10);
+        $user = auth()->user();
+
+        if ($user->hasRole('admin')) {
+            $bids = Bid::with('lawyer.user', 'case')->orderByDesc('id')->paginate(10);
+
+        } elseif ($user->hasRole('lawyer')) {
+            $lawyer = $user->lawyer;
+            $bids = Bid::with('lawyer.user', 'case')
+                ->where('lawyer_id', $lawyer->id)
+                ->orderByDesc('id')
+                ->paginate(10);
+
+        } elseif ($user->hasRole('client')) {
+            $client = $user->client;
+
+            // Get all lawsuit IDs belonging to this client
+            $caseIds = \App\Models\Lawsuit::where('client_id', $client->id)->pluck('id');
+
+            $bids = Bid::with('lawyer.user', 'case')
+                ->whereIn('case_id', $caseIds)
+                ->orderByDesc('id')
+                ->paginate(10);
+        } else {
+            // No access if role is not recognized
+            abort(403);
+        }
+
         return view('bids.index', compact('bids'))->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
@@ -35,6 +61,11 @@ class BidController extends Controller
         }
 
         $lawyers = Lawyer::where('user_id', Auth::id())->first();
+        $lawyer = null;
+
+        if (auth()->user()->hasRole('lawyer')) {
+            $lawyer = auth()->user()->lawyer;
+        }
 
         if (!$lawyers) {
             $lawyers = Lawyer::all(); // Admin case: list all lawyers
@@ -42,7 +73,7 @@ class BidController extends Controller
             $lawyers = collect([$lawyers]); // Lawyer case: single lawyer inside a collection
         }
 
-        return view('bids.create', compact('case', 'lawyers'));
+        return view('bids.create', compact('case', 'lawyers', 'lawyer'));
     }
 
 
@@ -88,20 +119,20 @@ class BidController extends Controller
     public function edit($id): View
     {
         $bid = Bid::findOrFail($id);
+        $lawyers = collect(); // Always define as a collection
 
         if (Auth::user()->hasRole('admin')) {
-            $lawyers = Lawyer::with('user')->get(); // Show all lawyers to admin
-        } elseif (Auth::user()->hasRole('lawyer')) {
-            $lawyers = Lawyer::with('user')
-                ->where('user_id', Auth::id()) // Only self for lawyer
-                ->get();
-        } else {
-            $lawyers = collect(); // Empty collection if not admin/lawyer
+            $lawyers = Lawyer::with('user')->get(); // Collection for admin
+        }
+
+        $lawyer = null;
+        if (auth()->user()->hasRole('lawyer')) {
+            $lawyer = auth()->user()->lawyer; // Single lawyer for logged-in lawyer
         }
 
         $cases = Lawsuit::all();
 
-        return view('bids.edit', compact('bid', 'cases', 'lawyers'));
+        return view('bids.edit', compact('bid', 'cases', 'lawyers', 'lawyer'));
     }
 
     public function update(Request $request, $id): RedirectResponse

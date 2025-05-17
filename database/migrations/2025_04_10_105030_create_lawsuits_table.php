@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('division')->nullable();
             $table->string('district')->nullable();
             $table->string('thana')->nullable();
+            $table->string('uploaded_file')->nullable();
 
             $table->timestamps();
         });

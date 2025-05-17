@@ -330,7 +330,7 @@ return [
             'can' => ['clients.list','clients.create','clients.show','clients.update','clients.delete'],
         ],
         [
-            'text' => 'Bids',
+            'text' => 'Proposals',
             'url' => 'bids',
             'icon' => 'fas fa-fw fa-handshake mr-2',
             'can' => ['bids.list','bids.create','bids.show','bids.update','bids.delete'],

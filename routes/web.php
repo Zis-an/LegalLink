@@ -1,30 +1,32 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BidController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\LawyerController;
 use App\Http\Controllers\LawyerVerificationController;
 use App\Http\Controllers\PermissionController;
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CaseController;
 
 Route::get('/', function () {
+    if (Auth::check()) { return redirect('/dashboard'); }
     return view('auth.login');
 });
 
-Auth::routes();
+Route::get('/welcome', function () { return view('welcome'); });
+Route::view('/pusher1', 'pusher1');
+Route::view('/pusher2', 'pusher2');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Auth::routes();
 
 // Combine profile routes inside the authenticated group
 Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () { return view('dashboard'); });
+
     // Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -54,3 +56,5 @@ require __DIR__.'/auth.php';
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+

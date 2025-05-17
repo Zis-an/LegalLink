@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PushNotification;
 use App\Models\Client;
 use App\Models\Lawyer;
+use App\Models\User;
+
 use Illuminate\Http\Request;
 use App\Models\Lawsuit;
 use Illuminate\Support\Facades\Storage;
@@ -51,22 +54,25 @@ class CaseController extends Controller
     }
 
 
-    public function create(): View
+    public function create()
     {
         $user = auth()->user();
+        $client = null;
+
+        if ($user->hasRole('lawyer')) {
+            return redirect()->route('cases.index')->with('error', 'You are not eligible to create an issue.');
+        }
 
         if ($user->hasRole('client')) {
             $client = Client::with('user')->where('user_id', $user->id)->first();
             $clients = collect([$client]);
         } elseif ($user->hasRole('admin')) {
             $clients = Client::with('user')->get();
-        } elseif ($user->hasRole('lawyer')) {
-            // Show limited client list or none — let lawyer search in the form
-            $clients = collect();
         } else {
             $clients = collect();
         }
-        return view('cases.create', compact('clients'));
+
+        return view('cases.create', compact('clients', 'client'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -77,9 +83,8 @@ class CaseController extends Controller
             'description' => 'required|string',
             'voice_note' => 'nullable|file|mimes:mp3,wav',
             'voice_note_blob' => 'nullable|string',
-            'status' => 'required|in:open,in_progress,closed',
             'category' => 'required|in:civil,criminal',
-            // 'subcategory' => 'required|string|max:255',
+            'uploaded_file' => 'nullable|file|mimes:jpg,jpeg,png,mp3,mp4|max:102400', // 100MB max
             'country' => 'nullable|string|max:255',
             'division' => 'nullable|string|max:255',
             'district' => 'nullable|string|max:255',
@@ -105,19 +110,31 @@ class CaseController extends Controller
             $path = $filename;
         }
 
-        Lawsuit::create([
+        $uploadedFilePath = null;
+
+        if ($request->hasFile('uploaded_file')) {
+            $uploadedFile = $request->file('uploaded_file');
+            $uploadedFileName = time() . '_' . $uploadedFile->getClientOriginalName();
+            $uploadedFilePath = $uploadedFile->storeAs('lawsuits/files', $uploadedFileName, 'public');
+        }
+
+        $lawsuit = Lawsuit::create([
             'client_id' => $request->client_id,
             'title' => $request->title,
             'description' => $request->description,
             'voice_note' => $path,
-            'status' => $request->status,
             'category' => $request->category,
-            // 'subcategory' => $request->subcategory,
+            'uploaded_file' => $uploadedFilePath,
             'country' => $request->country,
             'division' => $request->division,
             'district' => $request->district,
             'thana' => $request->thana,
         ]);
+
+        event(new PushNotification([
+            'author' => $lawsuit->client->user->name,
+            'category' => $lawsuit->category,
+        ]));
 
         return redirect()->route('cases.index')->with('success', 'Issue created successfully');
     }
@@ -131,6 +148,12 @@ class CaseController extends Controller
     public function edit(Lawsuit $case)
     {
         $clients = Client::with('user')->get();
+        $user = auth()->user();
+
+        if ($user->hasRole('lawyer')) {
+            return redirect()->route('cases.index')->with('error', 'You are not eligible to edit an issue.');
+        }
+
         return view('cases.edit', compact('case', 'clients'));
     }
 
@@ -143,7 +166,7 @@ class CaseController extends Controller
             'voice_note' => 'nullable|file|mimes:mp3,wav',
             'status' => 'required|in:open,in_progress,closed',
             'category' => 'required|in:Civil,Criminal',
-            'subcategory' => 'required|string|max:255',
+            'uploaded_file' => 'nullable|file|mimes:jpg,jpeg,png,mp3,mp4|max:102400', // 100MB max
             'country' => 'nullable|string|max:255',
             'division' => 'nullable|string|max:255',
             'district' => 'nullable|string|max:255',
@@ -158,28 +181,52 @@ class CaseController extends Controller
             $case->voice_note = $request->file('voice_note')->store('cases', 'public');
         }
 
+        if ($request->hasFile('uploaded_file')) {
+            if ($case->uploaded_file && Storage::disk('public')->exists($case->uploaded_file)) {
+                Storage::disk('public')->delete($case->uploaded_file);
+            }
+
+            $uploadedFile = $request->file('uploaded_file');
+            $uploadedFileName = time() . '_' . $uploadedFile->getClientOriginalName();
+            $case->uploaded_file = $uploadedFile->storeAs('lawsuits/files', $uploadedFileName, 'public');
+        }
+
         $case->update([
             'client_id' => $request->client_id,
             'title' => $request->title,
             'description' => $request->description,
             'status' => $request->status,
             'category' => $request->category,
-            'subcategory' => $request->subcategory,
             'country' => $request->country,
             'division' => $request->division,
             'district' => $request->district,
             'thana' => $request->thana,
         ]);
 
+        $case->save();
+
         return redirect()->route('cases.index')->with('success', 'Case updated successfully.');
     }
 
     public function destroy(Lawsuit $case)
     {
+        $user = auth()->user();
+
+        if ($user->hasRole('lawyer')) {
+            return redirect()->route('cases.index')->with('error', 'You are not eligible to delete an issue.');
+        }
+
+        // Delete voice_note file if exists
         if ($case->voice_note && Storage::disk('public')->exists($case->voice_note)) {
             Storage::disk('public')->delete($case->voice_note);
         }
 
+        // Delete uploaded_file if exists
+        if ($case->uploaded_file && Storage::disk('public')->exists($case->uploaded_file)) {
+            Storage::disk('public')->delete($case->uploaded_file);
+        }
+
+        // Delete the lawsuit record
         $case->delete();
 
         return redirect()->route('cases.index')->with('success', 'Case deleted successfully.');
