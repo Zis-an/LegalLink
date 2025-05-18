@@ -63,6 +63,10 @@
                                     <option value="rejected" {{ old('status', $bid->status) == 'rejected' ? 'selected' : '' }}>Rejected</option>
                                 </select>
                             </div>
+
+                            <div class="form-group col-md-6 my-auto">
+                                <a href="{{ url('chatify/' . $bid->lawyer->user->id) }}" class="btn btn-xl px-5 mt-2 btn-success">Chat</a>
+                            </div>
                         </div>
 
 

@@ -7,8 +7,10 @@ use App\Models\Client;
 use App\Models\Lawyer;
 use App\Models\User;
 
+use App\Notifications\CaseCreatedNotification;
 use Illuminate\Http\Request;
 use App\Models\Lawsuit;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -136,6 +138,13 @@ class CaseController extends Controller
             'category' => $lawsuit->category,
         ]));
 
+        // Target only lawyers and admins
+        $users = User::role(['admin', 'lawyer'])->get();
+        Notification::send($users, new CaseCreatedNotification([
+            'author' => $lawsuit->client->user->name,
+            'category' => $lawsuit->category,
+        ]));
+
         return redirect()->route('cases.index')->with('success', 'Issue created successfully');
     }
 
@@ -147,25 +156,33 @@ class CaseController extends Controller
 
     public function edit(Lawsuit $case)
     {
-        $clients = Client::with('user')->get();
         $user = auth()->user();
+        $client = null;
 
         if ($user->hasRole('lawyer')) {
-            return redirect()->route('cases.index')->with('error', 'You are not eligible to edit an issue.');
+            return redirect()->route('cases.index')->with('error', 'You are not eligible to create an issue.');
         }
 
-        return view('cases.edit', compact('case', 'clients'));
+        if ($user->hasRole('client')) {
+            $client = Client::with('user')->where('user_id', $user->id)->first();
+            $clients = collect([$client]);
+        } elseif ($user->hasRole('admin')) {
+            $clients = Client::with('user')->get();
+        } else {
+            $clients = collect();
+        }
+
+        return view('cases.edit', compact('case', 'clients', 'client'));
     }
 
     public function update(Request $request, Lawsuit $case)
     {
         $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'title' => 'required|string|max:255',
             'description' => 'required|string',
             'voice_note' => 'nullable|file|mimes:mp3,wav',
             'status' => 'required|in:open,in_progress,closed',
-            'category' => 'required|in:Civil,Criminal',
+            'category' => 'required|in:civil,criminal',
             'uploaded_file' => 'nullable|file|mimes:jpg,jpeg,png,mp3,mp4|max:102400', // 100MB max
             'country' => 'nullable|string|max:255',
             'division' => 'nullable|string|max:255',
@@ -193,7 +210,6 @@ class CaseController extends Controller
 
         $case->update([
             'client_id' => $request->client_id,
-            'title' => $request->title,
             'description' => $request->description,
             'status' => $request->status,
             'category' => $request->category,
@@ -205,7 +221,7 @@ class CaseController extends Controller
 
         $case->save();
 
-        return redirect()->route('cases.index')->with('success', 'Case updated successfully.');
+        return redirect()->route('cases.index')->with('success', 'Issue updated successfully.');
     }
 
     public function destroy(Lawsuit $case)

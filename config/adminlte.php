@@ -359,6 +359,12 @@ return [
             'icon' => 'fas fa-fw fa-users-cog mr-2',
             'can' => ['users.list','users.create','users.show','users.update','users.delete'],
         ],
+        [
+            'text' => 'Notifications',
+            'url' => 'notifications',
+            'icon' => 'fas fa-fw fa-users-cog mr-2',
+            'can' => ['notifications.list'],
+        ],
 
 //        [
 //            'type' => 'sidebar-menu-search',

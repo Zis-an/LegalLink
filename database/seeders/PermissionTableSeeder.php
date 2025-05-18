@@ -62,6 +62,8 @@ class PermissionTableSeeder extends Seeder
             'users.update',
             'users.delete',
 
+            'notifications.list',
+
         ];
 
         foreach ($permissions as $permission) {

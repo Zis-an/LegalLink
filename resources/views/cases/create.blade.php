@@ -67,7 +67,7 @@
                                             <select name="client_id" id="clientSelect" class="form-control select2"></select>
                                         @endif
                                     </div>
-                                    @elseif(auth()->user()->hasRole('client'))
+                                @elseif(auth()->user()->hasRole('client'))
                                         <input type="hidden" name="client_id" value="{{ $client->id }}">
                                 @endif
 
