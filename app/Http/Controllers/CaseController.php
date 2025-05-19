@@ -140,6 +140,7 @@ class CaseController extends Controller
 
         // Target only lawyers and admins
         $users = User::role(['admin', 'lawyer'])->get();
+
         Notification::send($users, new CaseCreatedNotification([
             'author' => $lawsuit->client->user->name,
             'category' => $lawsuit->category,

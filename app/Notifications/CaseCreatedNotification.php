@@ -33,7 +33,7 @@ class CaseCreatedNotification extends Notification implements ShouldBroadcast
         return [
             'author'   => $this->data['author'],
             'category' => $this->data['category'],
-            'message'  => 'A new case has been created.',
+            'message'  => 'A new issue has been created.',
         ];
     }
 
@@ -44,7 +44,7 @@ class CaseCreatedNotification extends Notification implements ShouldBroadcast
             'data' => [
                 'author'   => $this->data['author'],
                 'category' => $this->data['category'],
-                'message'  => 'A new case has been created.',
+                'message'  => 'A new issue has been created.',
             ]
         ]);
     }

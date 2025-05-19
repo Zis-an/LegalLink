@@ -32,7 +32,7 @@ class PushNotification implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new Channel('notification');
+         return new Channel('notification');
     }
 
     public function broadcastAs()
